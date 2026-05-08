@@ -66,11 +66,14 @@ actor RSSFetcher {
             guard let title = item.title, let link = item.link else { return nil }
             let guid = item.guid?.value ?? link
             let imageURL = extractImageURL(from: item)
+            var summary = item.description?.strippingHTML() ?? ""
+            if summary.isEmpty { summary = item.content?.contentEncoded?.strippingHTML() ?? "" }
+            summary = summary.truncated(to: 300)
             return ParsedArticle(
                 guid: guid,
                 url: link,
                 title: title,
-                summary: item.description?.strippingHTML() ?? "",
+                summary: summary,
                 imageURL: imageURL,
                 author: item.author ?? item.dublinCore?.dcCreator ?? "",
                 publishedAt: item.pubDate ?? Date()
@@ -128,51 +131,64 @@ actor RSSFetcher {
     }
 
     private func extractImageURL(from item: RSSFeedItem) -> String? {
-        // media:thumbnail
+        // 1. media:thumbnail (Zenn, YouTube など)
         if let thumbnail = item.media?.mediaThumbnails?.first?.attributes?.url {
             return thumbnail
         }
-        // media:content (image)
+        // 2. media:content — type が image/* OR medium が "image"
         if let content = item.media?.mediaContents?.first(where: {
-            $0.attributes?.medium == "image"
+            let attrs = $0.attributes
+            return attrs?.medium == "image" || (attrs?.type?.hasPrefix("image/") ?? false)
         })?.attributes?.url {
             return content
         }
-        // enclosure
-        if let enc = item.enclosure?.attributes,
-           let url = enc.url,
-           let type = enc.type,
-           type.hasPrefix("image") {
-            return url
+        // 3. Enclosure — type が image/* OR URL が画像パターン
+        //    (Zenn は type="false" だが URL が Cloudinary 画像のケースに対応)
+        if let enc = item.enclosure?.attributes, let url = enc.url {
+            let looksLikeImage = (enc.type?.hasPrefix("image/") ?? false)
+                || url.contains("/image/")
+                || url.hasSuffix(".jpg")
+                || url.hasSuffix(".jpeg")
+                || url.hasSuffix(".png")
+                || url.hasSuffix(".webp")
+            if looksLikeImage { return url }
         }
-        // first <img> from description HTML
-        if let html = item.description {
-            return extractFirstImageFromHTML(html)
+        // 4. content:encoded → description の順で最初の <img> を探す
+        for html in [item.content?.contentEncoded, item.description].compactMap({ $0 }) {
+            if let url = extractFirstImageFromHTML(html) { return url }
         }
         return nil
     }
 
+    private static let imgSrcRegex = try! NSRegularExpression(
+        pattern: #"(?i)<img[^>]+src=["']([^"']+)["']"#
+    )
+
     private func extractFirstImageFromHTML(_ html: String) -> String? {
-        let pattern = #"<img[^>]+src=[\"']([^\"']+)[\"']"#
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
-              let match = regex.firstMatch(in: html, range: NSRange(html.startIndex..., in: html)),
-              let range = Range(match.range(at: 1), in: html) else {
-            return nil
-        }
-        return String(html[range])
+        let range = NSRange(html.startIndex..., in: html)
+        guard let match = Self.imgSrcRegex.firstMatch(in: html, range: range),
+              let captureRange = Range(match.range(at: 1), in: html) else { return nil }
+        return String(html[captureRange])
     }
 }
 
 private extension String {
     func strippingHTML() -> String {
-        guard let data = self.data(using: .utf8) else { return self }
-        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
-            .documentType: NSAttributedString.DocumentType.html,
-            .characterEncoding: String.Encoding.utf8.rawValue
-        ]
-        guard let attributed = try? NSAttributedString(data: data, options: options, documentAttributes: nil) else {
-            return self.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
-        }
-        return attributed.string
+        var s = self
+            .replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&#39;", with: "'")
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+        s = s.trimmingCharacters(in: .whitespacesAndNewlines)
+        return s
+    }
+
+    func truncated(to maxLength: Int) -> String {
+        let chars = Array(self.unicodeScalars)
+        guard chars.count > maxLength else { return self }
+        return String(String.UnicodeScalarView(chars.prefix(maxLength))) + "…"
     }
 }

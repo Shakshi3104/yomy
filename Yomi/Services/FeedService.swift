@@ -1,6 +1,8 @@
 import Foundation
 import SwiftData
 
+private let ogFetchConcurrency = 5
+
 @MainActor
 final class FeedService {
     static let shared = FeedService()
@@ -17,6 +19,8 @@ final class FeedService {
         feed.fetchedAt = Date()
 
         let existingGUIDs = Set(feed.articles.map(\.guid))
+        var newArticles: [(Article, String)] = [] // (article, articleURL) for OG fetch
+
         for parsedArticle in parsed.articles {
             guard !existingGUIDs.contains(parsedArticle.guid) else { continue }
             let article = Article(
@@ -31,9 +35,34 @@ final class FeedService {
             )
             context.insert(article)
             feed.articles.append(article)
+
+            if parsedArticle.imageURL == nil && !parsedArticle.url.isEmpty {
+                newArticles.append((article, parsedArticle.url))
+            }
         }
 
         try context.save()
+
+        // OG フェッチ — 画像なし記事を並列で処理（最大 5 並列）
+        await withTaskGroup(of: Void.self) { group in
+            var running = 0
+            for (article, articleURL) in newArticles {
+                if running >= ogFetchConcurrency {
+                    await group.next()
+                    running -= 1
+                }
+                group.addTask {
+                    if let url = await OGImageFetcher.shared.fetch(articleURL: articleURL) {
+                        await MainActor.run { article.imageURL = url }
+                    }
+                }
+                running += 1
+            }
+        }
+
+        if !newArticles.isEmpty {
+            try context.save()
+        }
     }
 
     func refreshAll(feeds: [Feed], context: ModelContext) async {
@@ -58,6 +87,8 @@ final class FeedService {
         )
         context.insert(feed)
 
+        var newArticles: [(Article, String)] = []
+
         for parsedArticle in parsed.articles {
             let article = Article(
                 guid: parsedArticle.guid,
@@ -71,9 +102,34 @@ final class FeedService {
             )
             context.insert(article)
             feed.articles.append(article)
+
+            if parsedArticle.imageURL == nil && !parsedArticle.url.isEmpty {
+                newArticles.append((article, parsedArticle.url))
+            }
         }
 
         try context.save()
+
+        await withTaskGroup(of: Void.self) { group in
+            var running = 0
+            for (article, articleURL) in newArticles {
+                if running >= ogFetchConcurrency {
+                    await group.next()
+                    running -= 1
+                }
+                group.addTask {
+                    if let url = await OGImageFetcher.shared.fetch(articleURL: articleURL) {
+                        await MainActor.run { article.imageURL = url }
+                    }
+                }
+                running += 1
+            }
+        }
+
+        if !newArticles.isEmpty {
+            try context.save()
+        }
+
         return feed
     }
 
