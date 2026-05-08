@@ -12,7 +12,7 @@ struct ThumbnailView: View {
 
             if let imageURL = article.imageURL, let url = URL(string: imageURL) {
                 CachedAsyncImage(url: url) { image in
-                    image.resizable().aspectRatio(contentMode: .fit)
+                    image.resizable().aspectRatio(contentMode: .fill)
                 } placeholder: {
                     Color(.systemGray5)
                 }
@@ -27,7 +27,7 @@ struct ThumbnailView: View {
                     }
             }
         }
-        .frame(width: 80, height: 60)
+        .frame(width: 96, height: 54)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
