@@ -41,17 +41,7 @@ struct ArticleRowView: View {
 
             Spacer(minLength: 0)
 
-            if let imageURL = article.imageURL, let url = URL(string: imageURL) {
-                CachedAsyncImage(url: url) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Color(.systemGray5)
-                }
-                .frame(width: 72, height: 72)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-            }
+            ThumbnailView(article: article)
         }
         .padding(.vertical, 4)
         .opacity(article.isRead ? 0.7 : 1.0)

@@ -27,6 +27,7 @@
 		8295190B145063635A2CF3C7 /* OPMLManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F88F9C98C7F0B234D8DB16 /* OPMLManager.swift */; };
 		98F9A91802699313EF70BEAF /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02729AC73739B6CFF0674FFD /* SearchView.swift */; };
 		9FB324AACF6A8CF25F81F956 /* AddFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568C3CAA6609A899852D5386 /* AddFeedView.swift */; };
+		A80E3A67AE2CB68A6C21CC87 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30A7CB9242006BB2F144633 /* ThumbnailView.swift */; };
 		B2428997EA07F2D51E5F6D1B /* ArticleWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2886794B84312D768461BB9 /* ArticleWebView.swift */; };
 		C174A3F9622781277B6C9952 /* YomiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E1683BA11F1C5441D0587A5 /* YomiApp.swift */; };
 		CE696972B86ADC6341971F3F /* FeedDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA6D9D5F65929ADBBBB66E0 /* FeedDetailView.swift */; };
@@ -56,6 +57,7 @@
 		8C85B778AE190480F969669E /* Yomi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Yomi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D1FAF476B012BC57218C70E /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
 		A0F6415159792D42B57ECC98 /* BackgroundRefreshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshService.swift; sourceTree = "<group>"; };
+		B30A7CB9242006BB2F144633 /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
 		B73C4B4F34C9AB7071588D54 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C5059A9C974E138CA49EC216 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		CD77AF6E62E935C3AD959C61 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 				8D1FAF476B012BC57218C70E /* CachedAsyncImage.swift */,
 				0BDAB31D803F59984E369E06 /* FeaturedArticleCard.swift */,
 				4C9DDDCEA40E5FFCBF658213 /* FeedRowView.swift */,
+				B30A7CB9242006BB2F144633 /* ThumbnailView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -261,6 +264,7 @@
 				2306986AD2CF9B6EC15C3436 /* SavedView.swift in Sources */,
 				98F9A91802699313EF70BEAF /* SearchView.swift in Sources */,
 				D669AC453C40CC9FB74C41F4 /* SettingsView.swift in Sources */,
+				A80E3A67AE2CB68A6C21CC87 /* ThumbnailView.swift in Sources */,
 				C174A3F9622781277B6C9952 /* YomiApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

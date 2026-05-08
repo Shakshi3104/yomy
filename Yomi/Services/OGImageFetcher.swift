@@ -1,12 +1,16 @@
 import Foundation
+import os.log
+
+private let logger = Logger(subsystem: "com.minsc.yomi", category: "OGImageFetcher")
 
 // Fetches og:image / twitter:image from an article page.
 // Reads only the first 64 KB — OG tags are always in <head>.
 actor OGImageFetcher {
     static let shared = OGImageFetcher()
 
-    private static let ogImagePattern = #"(?i)<meta[^>]+(?:property=["']og:image["'][^>]+content=["']([^"']+)["']|content=["']([^"']+)["'][^>]+property=["']og:image["'])[^>]*>"#
-    private static let twitterImagePattern = #"(?i)<meta[^>]+(?:name=["']twitter:image["'][^>]+content=["']([^"']+)["']|content=["']([^"']+)["'][^>]+name=["']twitter:image["'])[^>]*>"#
+    // property= と name= 両方の形式に対応、前後順不問
+    private static let ogImagePattern = #"(?i)<meta[^>]+(?:(?:property|name)=["']og:image["'][^>]+content=["']([^"']+)["']|content=["']([^"']+)["'][^>]+(?:property|name)=["']og:image["'])[^>]*>"#
+    private static let twitterImagePattern = #"(?i)<meta[^>]+(?:name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["']|content=["']([^"']+)["'][^>]+name=["']twitter:image(?::src)?["'])[^>]*>"#
 
     private static let ogRegex = try! NSRegularExpression(pattern: ogImagePattern)
     private static let twitterRegex = try! NSRegularExpression(pattern: twitterImagePattern)
@@ -20,25 +24,39 @@ actor OGImageFetcher {
             forHTTPHeaderField: "User-Agent"
         )
 
-        guard let (data, response) = try? await URLSession.shared.data(for: request),
-              let http = response as? HTTPURLResponse,
-              http.statusCode < 400 else { return nil }
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else { return nil }
+            guard http.statusCode < 400 else {
+                logger.warning("OG fetch HTTP \(http.statusCode) for \(articleURL)")
+                return nil
+            }
 
-        // Read at most 64 KB
-        let chunk = data.prefix(64 * 1024)
-        guard let body = String(data: chunk, encoding: .utf8) ?? String(data: chunk, encoding: .isoLatin1) else {
+            // Read at most 64 KB
+            let chunk = data.prefix(64 * 1024)
+            guard let body = String(data: chunk, encoding: .utf8) ?? String(data: chunk, encoding: .isoLatin1) else {
+                logger.warning("OG fetch: failed to decode body for \(articleURL)")
+                return nil
+            }
+
+            let range = NSRange(body.startIndex..., in: body)
+
+            if let match = Self.ogRegex.firstMatch(in: body, range: range),
+               let result = extractCapture(match: match, in: body) {
+                logger.debug("OG image found (og): \(result) for \(articleURL)")
+                return result
+            }
+            if let match = Self.twitterRegex.firstMatch(in: body, range: range),
+               let result = extractCapture(match: match, in: body) {
+                logger.debug("OG image found (twitter): \(result) for \(articleURL)")
+                return result
+            }
+            logger.warning("OG image not found in HTML for \(articleURL)")
+            return nil
+        } catch {
+            logger.warning("OG fetch error: \(error.localizedDescription) for \(articleURL)")
             return nil
         }
-
-        let range = NSRange(body.startIndex..., in: body)
-
-        if let match = Self.ogRegex.firstMatch(in: body, range: range) {
-            return extractCapture(match: match, in: body)
-        }
-        if let match = Self.twitterRegex.firstMatch(in: body, range: range) {
-            return extractCapture(match: match, in: body)
-        }
-        return nil
     }
 
     private func extractCapture(match: NSTextCheckingResult, in body: String) -> String? {
