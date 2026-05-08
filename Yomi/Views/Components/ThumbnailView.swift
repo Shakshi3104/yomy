@@ -7,10 +7,12 @@ struct ThumbnailView: View {
     @Environment(\.modelContext) private var context
 
     var body: some View {
-        Group {
+        ZStack {
+            Color(.systemGray6)
+
             if let imageURL = article.imageURL, let url = URL(string: imageURL) {
                 CachedAsyncImage(url: url) { image in
-                    image.resizable().aspectRatio(contentMode: .fill)
+                    image.resizable().aspectRatio(contentMode: .fit)
                 } placeholder: {
                     Color(.systemGray5)
                 }
@@ -25,7 +27,7 @@ struct ThumbnailView: View {
                     }
             }
         }
-        .frame(width: 72, height: 72)
+        .frame(width: 80, height: 60)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }

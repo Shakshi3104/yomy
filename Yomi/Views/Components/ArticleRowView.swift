@@ -5,7 +5,7 @@ struct ArticleRowView: View {
     var showFeedName: Bool = true
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .center, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 if showFeedName, let feedTitle = article.feed?.title {
                     Text(feedTitle)
