@@ -6,7 +6,7 @@ struct FeaturedArticleCard: View {
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             if let imageURL = article.imageURL, let url = URL(string: imageURL) {
-                AsyncImage(url: url) { image in
+                CachedAsyncImage(url: url) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
