@@ -18,11 +18,17 @@ final class FeedService {
         }
         feed.fetchedAt = Date()
 
-        let existingGUIDs = Set(feed.articles.map(\.guid))
-        var newArticles: [(Article, String)] = [] // (article, articleURL) for OG fetch
+        let existingByGUID = Dictionary(uniqueKeysWithValues: feed.articles.map { ($0.guid, $0) })
+        var needsOGFetch: [(Article, String)] = []
 
         for parsedArticle in parsed.articles {
-            guard !existingGUIDs.contains(parsedArticle.guid) else { continue }
+            if let existing = existingByGUID[parsedArticle.guid] {
+                // 既存記事で imageURL がまだ未取得なら OG フェッチ対象に追加
+                if existing.imageURL == nil && !parsedArticle.url.isEmpty {
+                    needsOGFetch.append((existing, parsedArticle.url))
+                }
+                continue
+            }
             let article = Article(
                 guid: parsedArticle.guid,
                 url: parsedArticle.url,
@@ -37,16 +43,16 @@ final class FeedService {
             feed.articles.append(article)
 
             if parsedArticle.imageURL == nil && !parsedArticle.url.isEmpty {
-                newArticles.append((article, parsedArticle.url))
+                needsOGFetch.append((article, parsedArticle.url))
             }
         }
 
         try context.save()
 
-        // OG フェッチ — 画像なし記事を並列で処理（最大 5 並列）
+        // OG フェッチ — 新規・既存問わず imageURL が nil な記事を並列処理（最大 5 並列）
         await withTaskGroup(of: Void.self) { group in
             var running = 0
-            for (article, articleURL) in newArticles {
+            for (article, articleURL) in needsOGFetch {
                 if running >= ogFetchConcurrency {
                     await group.next()
                     running -= 1
@@ -60,7 +66,7 @@ final class FeedService {
             }
         }
 
-        if !newArticles.isEmpty {
+        if !needsOGFetch.isEmpty {
             try context.save()
         }
     }
@@ -87,7 +93,7 @@ final class FeedService {
         )
         context.insert(feed)
 
-        var newArticles: [(Article, String)] = []
+        var needsOGFetch: [(Article, String)] = []
 
         for parsedArticle in parsed.articles {
             let article = Article(
@@ -104,7 +110,7 @@ final class FeedService {
             feed.articles.append(article)
 
             if parsedArticle.imageURL == nil && !parsedArticle.url.isEmpty {
-                newArticles.append((article, parsedArticle.url))
+                needsOGFetch.append((article, parsedArticle.url))
             }
         }
 
@@ -112,7 +118,7 @@ final class FeedService {
 
         await withTaskGroup(of: Void.self) { group in
             var running = 0
-            for (article, articleURL) in newArticles {
+            for (article, articleURL) in needsOGFetch {
                 if running >= ogFetchConcurrency {
                     await group.next()
                     running -= 1
@@ -126,7 +132,7 @@ final class FeedService {
             }
         }
 
-        if !newArticles.isEmpty {
+        if !needsOGFetch.isEmpty {
             try context.save()
         }
 
