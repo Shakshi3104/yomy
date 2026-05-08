@@ -1,0 +1,38 @@
+name: Yomi
+options:
+  bundleIdPrefix: com.minsc
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+
+packages:
+  FeedKit:
+    url: https://github.com/nmdias/FeedKit
+    from: "9.1.2"
+
+targets:
+  Yomi:
+    type: application
+    platform: iOS
+    sources:
+      - path: Yomi
+    resources:
+      - path: Yomi/Assets.xcassets
+    info:
+      path: Yomi/Info.plist
+      properties:
+        UILaunchScreen:
+          UIColorName: ""
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.minsc.yomi.refresh
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+    dependencies:
+      - package: FeedKit
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1"
