@@ -11,7 +11,7 @@ struct WidgetArticle: Codable, Identifiable {
 }
 
 enum WidgetDataStore {
-    static let appGroupID = "group.com.minsc.yomi"
+    static let appGroupID = "group.com.shakshi.yomy"
     private static let fileName = "widget_articles.json"
 
     private static var containerURL: URL? {

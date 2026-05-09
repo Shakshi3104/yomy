@@ -3,7 +3,7 @@ import BackgroundTasks
 import SwiftData
 
 final class BackgroundRefreshService {
-    static let taskIdentifier = "com.minsc.yomi.refresh"
+    static let taskIdentifier = "com.shakshi.yomy.refresh"
 
     static func register() {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: taskIdentifier, using: nil) { task in
