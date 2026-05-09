@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import WidgetKit
 
 private let ogFetchConcurrency = 5
 
@@ -78,6 +79,44 @@ final class FeedService {
                     try? await self.refresh(feed: feed, context: context)
                 }
             }
+        }
+        saveWidgetData(context: context)
+    }
+
+    private func saveWidgetData(context: ModelContext) {
+        let descriptor = FetchDescriptor<Article>(
+            sortBy: [SortDescriptor(\.publishedAt, order: .reverse)]
+        )
+        guard let articles = try? context.fetch(descriptor) else { return }
+        let top = Array(articles.prefix(10))
+        let widgetArticles = top.map { article in
+            WidgetArticle(
+                id: article.id.uuidString,
+                title: article.title,
+                feedTitle: article.feed?.title ?? "",
+                url: article.url,
+                imageURL: article.imageURL,
+                publishedAt: article.publishedAt
+            )
+        }
+        WidgetDataStore.save(widgetArticles)
+
+        let keepIDs = Set(widgetArticles.map(\.id))
+        WidgetDataStore.cleanUpImages(keeping: keepIDs)
+
+        Task.detached {
+            await withTaskGroup(of: Void.self) { group in
+                for article in top {
+                    guard let urlString = article.imageURL,
+                          let url = URL(string: urlString) else { continue }
+                    if WidgetDataStore.loadImage(for: article.id.uuidString) != nil { continue }
+                    group.addTask {
+                        guard let (data, _) = try? await URLSession.shared.data(from: url) else { return }
+                        WidgetDataStore.cacheImage(data: data, for: article.id.uuidString)
+                    }
+                }
+            }
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 

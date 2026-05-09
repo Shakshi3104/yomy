@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 struct LatestView: View {
     @Environment(\.modelContext) private var context
@@ -42,9 +43,6 @@ struct LatestView: View {
                         }
                         .listRowSeparator(.hidden)
                         .buttonStyle(.plain)
-                        .simultaneousGesture(TapGesture().onEnded {
-                            featured.isRead = true
-                        })
                     }
                 }
 
@@ -55,9 +53,6 @@ struct LatestView: View {
                                 ArticleRowView(article: article)
                             }
                             .contextMenu { ArticleContextMenu(article: article) }
-                            .simultaneousGesture(TapGesture().onEnded {
-                                article.isRead = true
-                            })
                         }
                     }
                 }
@@ -68,6 +63,12 @@ struct LatestView: View {
             }
             .refreshable {
                 await refresh()
+            }
+            .onAppear {
+                updateWidgetData()
+            }
+            .onChange(of: articles) {
+                updateWidgetData()
             }
             .overlay {
                 if articles.isEmpty && !isRefreshing {
@@ -85,5 +86,43 @@ struct LatestView: View {
         isRefreshing = true
         await FeedService.shared.refreshAll(feeds: feeds, context: context)
         isRefreshing = false
+    }
+
+    private func updateWidgetData() {
+        guard !articles.isEmpty else { return }
+        let top = Array(articles.prefix(10))
+        let widgetArticles = top.map { article in
+            WidgetArticle(
+                id: article.id.uuidString,
+                title: article.title,
+                feedTitle: article.feed?.title ?? "",
+                url: article.url,
+                imageURL: article.imageURL,
+                publishedAt: article.publishedAt
+            )
+        }
+        WidgetDataStore.save(widgetArticles)
+
+        let keepIDs = Set(widgetArticles.map(\.id))
+        WidgetDataStore.cleanUpImages(keeping: keepIDs)
+
+        Task.detached {
+            await cacheWidgetImages(top)
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+
+    private nonisolated func cacheWidgetImages(_ articles: [Article]) async {
+        await withTaskGroup(of: Void.self) { group in
+            for article in articles {
+                guard let urlString = article.imageURL,
+                      let url = URL(string: urlString) else { continue }
+                if WidgetDataStore.loadImage(for: article.id.uuidString) != nil { continue }
+                group.addTask {
+                    guard let (data, _) = try? await URLSession.shared.data(from: url) else { return }
+                    WidgetDataStore.cacheImage(data: data, for: article.id.uuidString)
+                }
+            }
+        }
     }
 }

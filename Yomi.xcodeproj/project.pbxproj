@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		039D4CB15A3D2A140F8FFE4F /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C597D8CB3430F8C8974566 /* WidgetDataStore.swift */; };
 		06C9252A7E0A95F80CF8B89B /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5059A9C974E138CA49EC216 /* Category.swift */; };
 		158416DBA557DB7A6040D8E9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDCF4B7B5525AE410FE301B /* ContentView.swift */; };
 		17B0D9B29A8BDE7EC0EE0F55 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD77AF6E62E935C3AD959C61 /* Assets.xcassets */; };
 		20A5663EA9AB19AC7FDF2DE0 /* FeedsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4846F07A484320C32BA40468 /* FeedsView.swift */; };
+		20C768DABF429AE2024F4088 /* YomiWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4731ABBA770650273E328968 /* YomiWidget.swift */; };
 		2306986AD2CF9B6EC15C3436 /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D25FF693EFC654C05BC596E1 /* SavedView.swift */; };
 		29132B6FB84FC51AA6E34E84 /* ArticleContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0433804E832D2E6A378F503B /* ArticleContextMenu.swift */; };
 		2F89F234641A2CF9F707E8EB /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B5D01EC8ADF85FD2BD4C6D6 /* Article.swift */; };
@@ -18,8 +20,10 @@
 		42F1BF4C6BBC18F2725F6552 /* FeaturedArticleCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDAB31D803F59984E369E06 /* FeaturedArticleCard.swift */; };
 		481B888D93A391904382092E /* ArticleRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FDDB2FB7D493C42AEC3F37 /* ArticleRowView.swift */; };
 		4B4EEBC63BAFFD07CC326D43 /* LatestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB0C1AB154AB2E1EDF278B3 /* LatestView.swift */; };
+		4CB08D92CFE942C65BA98DAE /* YomiWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AF09DE22B595F75BE36A715A /* YomiWidget.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4F085C878D36E7C93B399394 /* FeedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E58EE73138EA0491E1F1D4 /* FeedService.swift */; };
 		57EAF15BE734A7D67BB496DE /* FeedKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB2E65ADE6687995FDB9CB62 /* FeedKit */; };
+		5BF9E1C1C2FAB59E69D994CE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B40C3E7AF40BA6D4AB98D570 /* WidgetKit.framework */; };
 		648F66F2D726C3D49EFF094D /* OGImageFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BC3432A4FFC1E775E48CE8 /* OGImageFetcher.swift */; };
 		6CA182C75F92DA060B01950F /* FeedRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C9DDDCEA40E5FFCBF658213 /* FeedRowView.swift */; };
 		76EA96E43E6EE8B3398D9227 /* FeedManageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FA4A2CA4B72E7996734DCE5 /* FeedManageView.swift */; };
@@ -28,13 +32,41 @@
 		98F9A91802699313EF70BEAF /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02729AC73739B6CFF0674FFD /* SearchView.swift */; };
 		9FB324AACF6A8CF25F81F956 /* AddFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568C3CAA6609A899852D5386 /* AddFeedView.swift */; };
 		A80E3A67AE2CB68A6C21CC87 /* ThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30A7CB9242006BB2F144633 /* ThumbnailView.swift */; };
+		AA794C4EBB7BEA697D72C5FA /* WidgetDataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C597D8CB3430F8C8974566 /* WidgetDataStore.swift */; };
 		B2428997EA07F2D51E5F6D1B /* ArticleWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2886794B84312D768461BB9 /* ArticleWebView.swift */; };
+		B4AEBBE14B1B74B9A7CFE171 /* YomiWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9ED7746BFF87EFE84C900E /* YomiWidgetBundle.swift */; };
 		C174A3F9622781277B6C9952 /* YomiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E1683BA11F1C5441D0587A5 /* YomiApp.swift */; };
+		C1C6BA1304B255E9006CA53E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B40C3E7AF40BA6D4AB98D570 /* WidgetKit.framework */; };
 		CE696972B86ADC6341971F3F /* FeedDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA6D9D5F65929ADBBBB66E0 /* FeedDetailView.swift */; };
 		D492249C726AC6153890BCB3 /* Feed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B92106D2BCCDE5451812493 /* Feed.swift */; };
 		D669AC453C40CC9FB74C41F4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4871C97EAC315B4E120BF5A1 /* SettingsView.swift */; };
+		F5A0BF7953124343D950A294 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D268347F07CE442158432829 /* SwiftUI.framework */; };
 		FAA49602D07209D0599FB1EE /* BackgroundRefreshService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0F6415159792D42B57ECC98 /* BackgroundRefreshService.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4BA4531F6381BC95634BE19F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9B4BCD3A7003E4381E0B87CA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 94B69E64152B15927D93C78E;
+			remoteInfo = YomiWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B537DE03CDE57A65E3BE7C2E /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				4CB08D92CFE942C65BA98DAE /* YomiWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		02729AC73739B6CFF0674FFD /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
@@ -43,7 +75,10 @@
 		0BDAB31D803F59984E369E06 /* FeaturedArticleCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeaturedArticleCard.swift; sourceTree = "<group>"; };
 		1E1683BA11F1C5441D0587A5 /* YomiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YomiApp.swift; sourceTree = "<group>"; };
 		24BC3432A4FFC1E775E48CE8 /* OGImageFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OGImageFetcher.swift; sourceTree = "<group>"; };
+		3300F53E6DB33DAC09AC1EF9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		3B5D01EC8ADF85FD2BD4C6D6 /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
+		4731ABBA770650273E328968 /* YomiWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YomiWidget.swift; sourceTree = "<group>"; };
+		47C597D8CB3430F8C8974566 /* WidgetDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetDataStore.swift; sourceTree = "<group>"; };
 		4846F07A484320C32BA40468 /* FeedsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedsView.swift; sourceTree = "<group>"; };
 		4871C97EAC315B4E120BF5A1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		4BA6D9D5F65929ADBBBB66E0 /* FeedDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedDetailView.swift; sourceTree = "<group>"; };
@@ -51,34 +86,70 @@
 		4C9DDDCEA40E5FFCBF658213 /* FeedRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedRowView.swift; sourceTree = "<group>"; };
 		568C3CAA6609A899852D5386 /* AddFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFeedView.swift; sourceTree = "<group>"; };
 		58E58EE73138EA0491E1F1D4 /* FeedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedService.swift; sourceTree = "<group>"; };
+		5A9ED7746BFF87EFE84C900E /* YomiWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YomiWidgetBundle.swift; sourceTree = "<group>"; };
 		5BDCF4B7B5525AE410FE301B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6FA4A2CA4B72E7996734DCE5 /* FeedManageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedManageView.swift; sourceTree = "<group>"; };
 		8B92106D2BCCDE5451812493 /* Feed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feed.swift; sourceTree = "<group>"; };
-		8C85B778AE190480F969669E /* Yomi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Yomi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8C85B778AE190480F969669E /* Yomi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yomi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D1FAF476B012BC57218C70E /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
+		9B4FEF5925A963691B0CAF9C /* YomiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = YomiWidget.entitlements; sourceTree = "<group>"; };
 		A0F6415159792D42B57ECC98 /* BackgroundRefreshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshService.swift; sourceTree = "<group>"; };
+		AF09DE22B595F75BE36A715A /* YomiWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = YomiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B30A7CB9242006BB2F144633 /* ThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailView.swift; sourceTree = "<group>"; };
+		B40C3E7AF40BA6D4AB98D570 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		B73C4B4F34C9AB7071588D54 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C5059A9C974E138CA49EC216 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		CAE9DD4191D45BD1C5B85A84 /* Yomi.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Yomi.entitlements; sourceTree = "<group>"; };
 		CD77AF6E62E935C3AD959C61 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D25FF693EFC654C05BC596E1 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
+		D268347F07CE442158432829 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		D912FB6EDE7FB28B88D4C35F /* RSSFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSSFetcher.swift; sourceTree = "<group>"; };
 		E2886794B84312D768461BB9 /* ArticleWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleWebView.swift; sourceTree = "<group>"; };
 		F3FDDB2FB7D493C42AEC3F37 /* ArticleRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleRowView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		CEA57D37C6F283D7269EFEE9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1C6BA1304B255E9006CA53E /* WidgetKit.framework in Frameworks */,
+				F5A0BF7953124343D950A294 /* SwiftUI.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E0BD51C833999011F6D09A8D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				57EAF15BE734A7D67BB496DE /* FeedKit in Frameworks */,
+				5BF9E1C1C2FAB59E69D994CE /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0508FEB4DBE9F26FBDCB8135 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D268347F07CE442158432829 /* SwiftUI.framework */,
+				B40C3E7AF40BA6D4AB98D570 /* WidgetKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		0736E90A8646AC9FC84C4F65 /* YomiWidget */ = {
+			isa = PBXGroup;
+			children = (
+				3300F53E6DB33DAC09AC1EF9 /* Info.plist */,
+				9B4FEF5925A963691B0CAF9C /* YomiWidget.entitlements */,
+				4731ABBA770650273E328968 /* YomiWidget.swift */,
+				5A9ED7746BFF87EFE84C900E /* YomiWidgetBundle.swift */,
+			);
+			path = YomiWidget;
+			sourceTree = "<group>";
+		};
 		0BB2DF69780D7D37613831D6 /* BackgroundRefresh */ = {
 			isa = PBXGroup;
 			children = (
@@ -87,10 +158,21 @@
 			path = BackgroundRefresh;
 			sourceTree = "<group>";
 		};
+		3694FB2F789AC37FCD7EDE32 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				47C597D8CB3430F8C8974566 /* WidgetDataStore.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		6B0530B8706F6B6A54021FA7 = {
 			isa = PBXGroup;
 			children = (
+				3694FB2F789AC37FCD7EDE32 /* Shared */,
 				C32D1087A3030F2ECDCB3D1D /* Yomi */,
+				0736E90A8646AC9FC84C4F65 /* YomiWidget */,
+				0508FEB4DBE9F26FBDCB8135 /* Frameworks */,
 				F7013CE2A62F1D4EA616D8A5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -129,6 +211,7 @@
 				CD77AF6E62E935C3AD959C61 /* Assets.xcassets */,
 				5BDCF4B7B5525AE410FE301B /* ContentView.swift */,
 				B73C4B4F34C9AB7071588D54 /* Info.plist */,
+				CAE9DD4191D45BD1C5B85A84 /* Yomi.entitlements */,
 				1E1683BA11F1C5441D0587A5 /* YomiApp.swift */,
 				0BB2DF69780D7D37613831D6 /* BackgroundRefresh */,
 				C6C670FC9AB6147E2E72C90A /* Models */,
@@ -165,6 +248,7 @@
 			isa = PBXGroup;
 			children = (
 				8C85B778AE190480F969669E /* Yomi.app */,
+				AF09DE22B595F75BE36A715A /* YomiWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -179,10 +263,12 @@
 				83BDCD247950515FB0375CDD /* Sources */,
 				C377D8EE04CC7BBCEA868643 /* Resources */,
 				E0BD51C833999011F6D09A8D /* Frameworks */,
+				B537DE03CDE57A65E3BE7C2E /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				49DBB610298C97DD0F9D381A /* PBXTargetDependency */,
 			);
 			name = Yomi;
 			packageProductDependencies = (
@@ -192,6 +278,24 @@
 			productReference = 8C85B778AE190480F969669E /* Yomi.app */;
 			productType = "com.apple.product-type.application";
 		};
+		94B69E64152B15927D93C78E /* YomiWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8E5F05950C1D19FF86DDD531 /* Build configuration list for PBXNativeTarget "YomiWidget" */;
+			buildPhases = (
+				0ED16F5A9D44DDB3C08CFE67 /* Sources */,
+				CEA57D37C6F283D7269EFEE9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = YomiWidget;
+			packageProductDependencies = (
+			);
+			productName = YomiWidget;
+			productReference = AF09DE22B595F75BE36A715A /* YomiWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -200,8 +304,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 0BDE7A78CC8C2E9F020A2B84 /* Build configuration list for PBXProject "Yomi" */;
 			developmentRegion = en;
@@ -221,6 +323,7 @@
 			projectRoot = "";
 			targets = (
 				28856BEEAA58FA10F4C79F59 /* Yomi */,
+				94B69E64152B15927D93C78E /* YomiWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -237,6 +340,16 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0ED16F5A9D44DDB3C08CFE67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA794C4EBB7BEA697D72C5FA /* WidgetDataStore.swift in Sources */,
+				20C768DABF429AE2024F4088 /* YomiWidget.swift in Sources */,
+				B4AEBBE14B1B74B9A7CFE171 /* YomiWidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		83BDCD247950515FB0375CDD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -265,18 +378,47 @@
 				98F9A91802699313EF70BEAF /* SearchView.swift in Sources */,
 				D669AC453C40CC9FB74C41F4 /* SettingsView.swift in Sources */,
 				A80E3A67AE2CB68A6C21CC87 /* ThumbnailView.swift in Sources */,
+				039D4CB15A3D2A140F8FFE4F /* WidgetDataStore.swift in Sources */,
 				C174A3F9622781277B6C9952 /* YomiApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		49DBB610298C97DD0F9D381A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 94B69E64152B15927D93C78E /* YomiWidget */;
+			targetProxy = 4BA4531F6381BC95634BE19F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		1DF0E3AF8CFDE1F390E26491 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YomiWidget/YomiWidget.entitlements;
+				DEVELOPMENT_TEAM = YS7T76Q587;
+				INFOPLIST_FILE = YomiWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.minsc.Yomi.widget;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 		668794423ABCDA8488FA5C53 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Yomi/Yomi.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = YS7T76Q587;
 				INFOPLIST_FILE = Yomi/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -356,7 +498,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Yomi/Yomi.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = YS7T76Q587;
 				INFOPLIST_FILE = Yomi/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -425,6 +569,24 @@
 			};
 			name = Release;
 		};
+		EBA9A6371A4C968C4F3EAA0F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YomiWidget/YomiWidget.entitlements;
+				DEVELOPMENT_TEAM = YS7T76Q587;
+				INFOPLIST_FILE = YomiWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.minsc.Yomi.widget;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -433,6 +595,15 @@
 			buildConfigurations = (
 				68A5ACD7A932C7950E35E453 /* Debug */,
 				C612B4CCD25C912A9031F1CF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8E5F05950C1D19FF86DDD531 /* Build configuration list for PBXNativeTarget "YomiWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EBA9A6371A4C968C4F3EAA0F /* Debug */,
+				1DF0E3AF8CFDE1F390E26491 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

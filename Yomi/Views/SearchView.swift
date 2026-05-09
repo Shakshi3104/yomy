@@ -41,9 +41,6 @@ private struct SearchResultsView: View {
             NavigationLink(value: article) {
                 ArticleRowView(article: article)
             }
-            .simultaneousGesture(TapGesture().onEnded {
-                article.isRead = true
-            })
         }
         .navigationDestination(for: Article.self) { article in
             ArticleWebView(article: article)

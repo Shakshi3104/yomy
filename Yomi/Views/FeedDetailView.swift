@@ -17,9 +17,6 @@ struct FeedDetailView: View {
                 ArticleRowView(article: article, showFeedName: false)
             }
             .contextMenu { ArticleContextMenu(article: article) }
-            .simultaneousGesture(TapGesture().onEnded {
-                article.isRead = true
-            })
         }
         .navigationTitle(feed.title.isEmpty ? feed.url : feed.title)
         .navigationBarTitleDisplayMode(.inline)
