@@ -1,7 +1,7 @@
 import Foundation
 import os.log
 
-private let logger = Logger(subsystem: "com.minsc.yomi", category: "OGImageFetcher")
+private let logger = Logger(subsystem: "com.shakshi.yomy", category: "OGImageFetcher")
 
 // Fetches og:image / twitter:image from an article page.
 // Reads only the first 64 KB — OG tags are always in <head>.
