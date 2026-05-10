@@ -1,7 +1,9 @@
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
-    @State private var widgetURL: URL?
+    @Environment(\.modelContext) private var context
+    @State private var widgetArticle: Article?
 
     var body: some View {
         tabs
@@ -9,24 +11,15 @@ struct ContentView: View {
                 guard url.scheme == "yomi",
                       url.host == "open",
                       let urlString = URLComponents(url: url, resolvingAgainstBaseURL: false)?
-                          .queryItems?.first(where: { $0.name == "url" })?.value,
-                      let articleURL = URL(string: urlString) else { return }
-                widgetURL = articleURL
+                          .queryItems?.first(where: { $0.name == "url" })?.value else { return }
+                let descriptor = FetchDescriptor<Article>(
+                    predicate: #Predicate { $0.url == urlString }
+                )
+                widgetArticle = try? context.fetch(descriptor).first
             }
-            .sheet(isPresented: Binding(
-                get: { widgetURL != nil },
-                set: { if !$0 { widgetURL = nil } }
-            )) {
-                if let url = widgetURL {
-                    NavigationStack {
-                        WebViewRepresentable(url: url)
-                            .navigationBarTitleDisplayMode(.inline)
-                            .toolbar {
-                                ToolbarItem(placement: .cancellationAction) {
-                                    Button("Close") { widgetURL = nil }
-                                }
-                            }
-                    }
+            .sheet(item: $widgetArticle) { article in
+                NavigationStack {
+                    ArticleWebView(article: article)
                 }
             }
     }

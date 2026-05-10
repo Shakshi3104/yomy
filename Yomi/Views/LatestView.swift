@@ -72,8 +72,10 @@ struct LatestView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView()
             }
-            .navigationDestination(item: $selectedArticle) { article in
-                ArticleWebView(article: article)
+            .sheet(item: $selectedArticle) { article in
+                NavigationStack {
+                    ArticleWebView(article: article)
+                }
             }
             .refreshable {
                 await refresh()

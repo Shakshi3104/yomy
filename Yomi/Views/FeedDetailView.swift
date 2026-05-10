@@ -30,8 +30,10 @@ struct FeedDetailView: View {
         }
         .navigationTitle(feed.title.isEmpty ? feed.url : feed.title)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(item: $selectedArticle) { article in
-            ArticleWebView(article: article)
+        .sheet(item: $selectedArticle) { article in
+            NavigationStack {
+                ArticleWebView(article: article)
+            }
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
