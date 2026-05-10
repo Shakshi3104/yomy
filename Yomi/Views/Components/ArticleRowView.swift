@@ -120,7 +120,7 @@ struct ArticleRowView: View {
 
     private var bottomRow: some View {
         HStack(spacing: 8) {
-            Text(article.publishedAt.relativeFormatted)
+            Text(article.publishedAt.publishedFormatted)
                 .font(.caption)
                 .foregroundStyle(.secondary)
             if !article.author.isEmpty {
@@ -158,4 +158,14 @@ extension Date {
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: self, relativeTo: Date())
     }
+
+    var publishedFormatted: String {
+        Self.publishedFormatter.string(from: self)
+    }
+
+    private static let publishedFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy/MM/dd HH:mm"
+        return f
+    }()
 }
