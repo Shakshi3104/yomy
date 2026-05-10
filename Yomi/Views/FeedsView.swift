@@ -6,7 +6,6 @@ struct FeedsView: View {
     @Query(sort: \Feed.createdAt) private var feeds: [Feed]
 
     @State private var showAddFeed = false
-    @State private var feedToManage: Feed?
 
     private var groupedFeeds: [(String, [Feed])] {
         let groups = Dictionary(grouping: feeds, by: \.category)
@@ -30,12 +29,6 @@ struct FeedsView: View {
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
-                                Button {
-                                    feedToManage = feed
-                                } label: {
-                                    Label("Edit", systemImage: "pencil")
-                                }
-                                .tint(.blue)
                             }
                         }
                     }
@@ -53,9 +46,6 @@ struct FeedsView: View {
             }
             .sheet(isPresented: $showAddFeed) {
                 AddFeedView()
-            }
-            .sheet(item: $feedToManage) { feed in
-                FeedManageView(feed: feed)
             }
             .overlay {
                 if feeds.isEmpty {

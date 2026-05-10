@@ -5,10 +5,8 @@ struct FeedManageView: View {
     let feed: Feed
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \Category.sortOrder) private var categories: [Category]
 
     @State private var selectedCategory: String
-    @State private var newCategoryName = ""
 
     init(feed: Feed) {
         self.feed = feed
@@ -28,20 +26,7 @@ struct FeedManageView: View {
                     }
                 }
 
-                Section("Category") {
-                    Picker("Category", selection: $selectedCategory) {
-                        Text("None").tag("")
-                        ForEach(categories) { cat in
-                            Text(cat.name).tag(cat.name)
-                        }
-                    }
-
-                    HStack {
-                        TextField("New category", text: $newCategoryName)
-                        Button("Add") { addCategory() }
-                            .disabled(trimmedNewCategoryName.isEmpty)
-                    }
-                }
+                CategoryPickerSection(selectedCategory: $selectedCategory)
             }
             .navigationTitle("Edit Feed")
             .navigationBarTitleDisplayMode(.inline)
@@ -58,20 +43,5 @@ struct FeedManageView: View {
                 }
             }
         }
-    }
-
-    private var trimmedNewCategoryName: String {
-        newCategoryName.trimmingCharacters(in: .whitespaces)
-    }
-
-    private func addCategory() {
-        let name = trimmedNewCategoryName
-        guard !name.isEmpty,
-              !categories.contains(where: { $0.name == name }) else { return }
-        let cat = Category(name: name, sortOrder: categories.count)
-        context.insert(cat)
-        try? context.save()
-        selectedCategory = name
-        newCategoryName = ""
     }
 }
