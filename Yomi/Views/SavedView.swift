@@ -9,6 +9,7 @@ struct SavedView: View {
     ) private var articles: [Article]
 
     @Environment(\.modelContext) private var context
+    @State private var selectedArticle: Article?
 
     private var grouped: [(String, [Article])] {
         let formatter = DateFormatter()
@@ -25,9 +26,16 @@ struct SavedView: View {
                 ForEach(grouped, id: \.0) { month, monthArticles in
                     Section(month) {
                         ForEach(monthArticles) { article in
-                            NavigationLink(value: article) {
+                            Button {
+                                selectedArticle = article
+                            } label: {
                                 ArticleRowView(article: article)
                             }
+                            .buttonStyle(.plain)
+                            .contextMenu { ArticleContextMenu(article: article) }
+                            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
                                     article.isSaved = false
@@ -41,7 +49,7 @@ struct SavedView: View {
                 }
             }
             .navigationTitle("Saved")
-            .navigationDestination(for: Article.self) { article in
+            .navigationDestination(item: $selectedArticle) { article in
                 ArticleWebView(article: article)
             }
             .overlay {
