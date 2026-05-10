@@ -133,6 +133,12 @@ struct ArticleRowView: View {
                     .lineLimit(1)
             }
             Spacer(minLength: 8)
+            if article.isSaved {
+                Image(systemName: "bookmark.fill")
+                    .font(.caption)
+                    .foregroundStyle(.tint)
+                    .accessibilityLabel("Saved")
+            }
             actionsMenu
         }
     }
