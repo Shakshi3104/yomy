@@ -49,8 +49,10 @@ struct SavedView: View {
                 }
             }
             .navigationTitle("Saved")
-            .navigationDestination(item: $selectedArticle) { article in
-                ArticleWebView(article: article)
+            .sheet(item: $selectedArticle) { article in
+                NavigationStack {
+                    ArticleWebView(article: article)
+                }
             }
             .overlay {
                 if articles.isEmpty {

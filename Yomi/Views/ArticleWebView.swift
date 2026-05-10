@@ -4,21 +4,27 @@ import WebKit
 struct ArticleWebView: View {
     let article: Article
     @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         WebViewRepresentable(url: URL(string: article.url))
             .navigationTitle(article.feed?.title ?? "")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Close") { dismiss() }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-                        Button {
-                            article.isSaved.toggle()
-                            try? context.save()
-                        } label: {
-                            Image(systemName: article.isSaved ? "bookmark.fill" : "bookmark")
-                        }
-                        ShareLink(item: URL(string: article.url)!) {
+                    Button {
+                        article.isSaved.toggle()
+                        try? context.save()
+                    } label: {
+                        Image(systemName: article.isSaved ? "bookmark.fill" : "bookmark")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    if let url = URL(string: article.url) {
+                        ShareLink(item: url) {
                             Image(systemName: "square.and.arrow.up")
                         }
                     }

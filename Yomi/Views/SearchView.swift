@@ -50,8 +50,10 @@ private struct SearchResultsView: View {
             .listRowSeparator(.hidden)
             .listRowBackground(Color.clear)
         }
-        .navigationDestination(item: $selectedArticle) { article in
-            ArticleWebView(article: article)
+        .sheet(item: $selectedArticle) { article in
+            NavigationStack {
+                ArticleWebView(article: article)
+            }
         }
         .overlay {
             if articles.isEmpty && !query.isEmpty {
