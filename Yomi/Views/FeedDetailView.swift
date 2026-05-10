@@ -7,6 +7,9 @@ struct FeedDetailView: View {
 
     @State private var isRefreshing = false
     @State private var selectedArticle: Article?
+    @State private var showEditFeed = false
+    @State private var showDeleteConfirmation = false
+    @Environment(\.dismiss) private var dismiss
 
     private var sortedArticles: [Article] {
         feed.articles.sorted { $0.publishedAt > $1.publishedAt }
@@ -43,10 +46,33 @@ struct FeedDetailView: View {
                     } label: {
                         Label("Refresh", systemImage: "arrow.clockwise")
                     }
+                    Divider()
+                    Button {
+                        showEditFeed = true
+                    } label: {
+                        Label("Edit Feed", systemImage: "pencil")
+                    }
+                    Button(role: .destructive) {
+                        showDeleteConfirmation = true
+                    } label: {
+                        Label("Delete Feed", systemImage: "trash")
+                    }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
             }
+        }
+        .sheet(isPresented: $showEditFeed) {
+            FeedManageView(feed: feed)
+        }
+        .alert("Delete Feed?", isPresented: $showDeleteConfirmation) {
+            Button("Delete", role: .destructive) {
+                try? FeedService.shared.deleteFeed(feed, context: context)
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("\"\(feed.title.isEmpty ? feed.url : feed.title)\" and all its articles will be removed.")
         }
         .refreshable {
             try? await FeedService.shared.refresh(feed: feed, context: context)
