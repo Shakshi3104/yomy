@@ -8,6 +8,7 @@ struct LatestView: View {
     @Query private var feeds: [Feed]
 
     @State private var isRefreshing = false
+    @State private var navigateToFeatured: Article?
 
     private var featuredArticle: Article? {
         articles.first
@@ -37,12 +38,15 @@ struct LatestView: View {
             List {
                 if let featured = featuredArticle {
                     Section {
-                        NavigationLink(value: featured) {
+                        Button {
+                            navigateToFeatured = featured
+                        } label: {
                             FeaturedArticleCard(article: featured)
-                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                         }
-                        .listRowSeparator(.hidden)
                         .buttonStyle(.plain)
+                        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
                     }
                 }
 
@@ -59,6 +63,9 @@ struct LatestView: View {
             }
             .navigationTitle("Latest")
             .navigationDestination(for: Article.self) { article in
+                ArticleWebView(article: article)
+            }
+            .navigationDestination(item: $navigateToFeatured) { article in
                 ArticleWebView(article: article)
             }
             .refreshable {

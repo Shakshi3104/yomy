@@ -6,15 +6,30 @@ struct FeaturedArticleCard: View {
     @Environment(\.modelContext) private var context
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
+        VStack(alignment: .leading, spacing: 0) {
             imageLayer
-            gradientLayer
-            textLayer
+                .frame(maxWidth: .infinity)
+                .frame(height: 180)
+                .clipped()
+
+            VStack(alignment: .leading, spacing: 4) {
+                if let feedTitle = article.feed?.title {
+                    Text(feedTitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                Text(article.title)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                    .lineLimit(3)
+                    .multilineTextAlignment(.leading)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 220)
+        .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .contentShape(RoundedRectangle(cornerRadius: 16))
     }
 
     @ViewBuilder
@@ -25,7 +40,6 @@ struct FeaturedArticleCard: View {
             } placeholder: {
                 Color(.systemGray5)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             Color(.systemGray5)
                 .task(id: article.url) {
@@ -36,29 +50,5 @@ struct FeaturedArticleCard: View {
                     }
                 }
         }
-    }
-
-    private var gradientLayer: some View {
-        LinearGradient(
-            colors: [.clear, .black.opacity(0.75)],
-            startPoint: .center,
-            endPoint: .bottom
-        )
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    private var textLayer: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            if let feedTitle = article.feed?.title {
-                Text(feedTitle)
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.8))
-            }
-            Text(article.title)
-                .font(.headline)
-                .foregroundStyle(.white)
-                .lineLimit(3)
-        }
-        .padding(16)
     }
 }
