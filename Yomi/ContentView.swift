@@ -24,11 +24,6 @@ struct ContentView: View {
                 .tabItem {
                     Label("Search", systemImage: "magnifyingglass")
                 }
-
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
-                }
         }
         .onOpenURL { url in
             guard url.scheme == "yomi",

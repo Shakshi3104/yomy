@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.dismiss) private var dismiss
     @Query(sort: \Category.sortOrder) private var categories: [Category]
     @Query private var feeds: [Feed]
 
@@ -23,6 +24,11 @@ struct SettingsView: View {
                 aboutSection
             }
             .navigationTitle("Settings")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
             .fileImporter(
                 isPresented: $showOPMLImporter,
                 allowedContentTypes: [.xml, UTType("public.opml") ?? .xml]

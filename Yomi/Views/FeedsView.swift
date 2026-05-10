@@ -7,6 +7,7 @@ struct FeedsView: View {
 
     @State private var showAddFeed = false
     @State private var feedToManage: Feed?
+    @State private var showSettings = false
 
     private var groupedFeeds: [(String, [Feed])] {
         let groups = Dictionary(grouping: feeds, by: \.category)
@@ -45,6 +46,13 @@ struct FeedsView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gear")
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
                         showAddFeed = true
                     } label: {
                         Image(systemName: "plus")
@@ -53,6 +61,9 @@ struct FeedsView: View {
             }
             .sheet(isPresented: $showAddFeed) {
                 AddFeedView()
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
             }
             .sheet(item: $feedToManage) { feed in
                 FeedManageView(feed: feed)

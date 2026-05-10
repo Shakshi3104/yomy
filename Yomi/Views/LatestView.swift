@@ -9,6 +9,7 @@ struct LatestView: View {
 
     @State private var isRefreshing = false
     @State private var navigateToFeatured: Article?
+    @State private var showSettings = false
 
     private var featuredArticle: Article? {
         articles.first
@@ -62,6 +63,18 @@ struct LatestView: View {
                 }
             }
             .navigationTitle("Latest")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gear")
+                    }
+                }
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+            }
             .navigationDestination(for: Article.self) { article in
                 ArticleWebView(article: article)
             }
