@@ -11,6 +11,7 @@
 		06C9252A7E0A95F80CF8B89B /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5059A9C974E138CA49EC216 /* Category.swift */; };
 		158416DBA557DB7A6040D8E9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDCF4B7B5525AE410FE301B /* ContentView.swift */; };
 		17B0D9B29A8BDE7EC0EE0F55 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD77AF6E62E935C3AD959C61 /* Assets.xcassets */; };
+		D1C0DF1ED1C0DF1ED1C0DF11 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = D1C0DF1ED1C0DF1ED1C0DF10 /* AppIcon.icon */; };
 		20A5663EA9AB19AC7FDF2DE0 /* FeedsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4846F07A484320C32BA40468 /* FeedsView.swift */; };
 		20C768DABF429AE2024F4088 /* YomiWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4731ABBA770650273E328968 /* YomiWidget.swift */; };
 		2306986AD2CF9B6EC15C3436 /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D25FF693EFC654C05BC596E1 /* SavedView.swift */; };
@@ -103,6 +104,7 @@
 		C5059A9C974E138CA49EC216 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		CAE9DD4191D45BD1C5B85A84 /* Yomi.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Yomi.entitlements; sourceTree = "<group>"; };
 		CD77AF6E62E935C3AD959C61 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D1C0DF1ED1C0DF1ED1C0DF10 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		D25FF693EFC654C05BC596E1 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
 		D268347F07CE442158432829 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		D912FB6EDE7FB28B88D4C35F /* RSSFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSSFetcher.swift; sourceTree = "<group>"; };
@@ -239,6 +241,7 @@
 		C32D1087A3030F2ECDCB3D1D /* Yomi */ = {
 			isa = PBXGroup;
 			children = (
+				D1C0DF1ED1C0DF1ED1C0DF10 /* AppIcon.icon */,
 				CD77AF6E62E935C3AD959C61 /* Assets.xcassets */,
 				5BDCF4B7B5525AE410FE301B /* ContentView.swift */,
 				B73C4B4F34C9AB7071588D54 /* Info.plist */,
@@ -361,6 +364,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				17B0D9B29A8BDE7EC0EE0F55 /* Assets.xcassets in Resources */,
+				D1C0DF1ED1C0DF1ED1C0DF11 /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
