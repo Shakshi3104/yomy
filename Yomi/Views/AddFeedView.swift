@@ -7,27 +7,68 @@ struct AddFeedView: View {
     @Query(sort: \Category.sortOrder) private var categories: [Category]
 
     @State private var urlText = ""
-    @State private var selectedCategory = "General"
+    @State private var selectedCategory = ""
+    @State private var newCategoryName = ""
+    @State private var showNewCategoryAlert = false
     @State private var isLoading = false
     @State private var errorMessage: String?
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("フィードURL") {
-                    TextField("https://example.com/feed", text: $urlText)
-                        .keyboardType(.URL)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
+                Section("Feed URL") {
+                    ZStack(alignment: .leading) {
+                        if urlText.isEmpty {
+                            Text(verbatim: "https://example.com/feed")
+                                .foregroundStyle(.secondary)
+                                .allowsHitTesting(false)
+                        }
+                        TextField("", text: $urlText)
+                            .keyboardType(.URL)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                    }
                 }
 
-                Section("カテゴリ") {
-                    Picker("カテゴリ", selection: $selectedCategory) {
-                        Text("General").tag("General")
+                Section("Category") {
+                    Menu {
+                        Button {
+                            selectedCategory = ""
+                        } label: {
+                            if selectedCategory.isEmpty {
+                                Label("None", systemImage: "checkmark")
+                            } else {
+                                Text("None")
+                            }
+                        }
                         ForEach(categories) { cat in
-                            Text(cat.name).tag(cat.name)
+                            Button {
+                                selectedCategory = cat.name
+                            } label: {
+                                if selectedCategory == cat.name {
+                                    Label(cat.name, systemImage: "checkmark")
+                                } else {
+                                    Text(cat.name)
+                                }
+                            }
+                        }
+                        Divider()
+                        Button {
+                            showNewCategoryAlert = true
+                        } label: {
+                            Label("New Category...", systemImage: "plus.circle")
+                        }
+                    } label: {
+                        HStack {
+                            Text(selectedCategory.isEmpty ? "None" : selectedCategory)
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
                         }
                     }
+                    .tint(.primary)
                 }
 
                 if let errorMessage {
@@ -38,22 +79,39 @@ struct AddFeedView: View {
                     }
                 }
             }
-            .navigationTitle("フィードを追加")
+            .navigationTitle("Add Feed")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") { dismiss() }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("追加") {
+                    Button("Add") {
                         Task { await addFeed() }
                     }
                     .disabled(urlText.isEmpty || isLoading)
                 }
             }
+            .alert("New Category", isPresented: $showNewCategoryAlert) {
+                TextField("Category name", text: $newCategoryName)
+                    .textInputAutocapitalization(.words)
+                Button("Add") { addCategory() }
+                    .disabled(trimmedNewCategoryName.isEmpty)
+                Button("Cancel", role: .cancel) {
+                    newCategoryName = ""
+                }
+            }
+            .onAppear {
+                guard selectedCategory.isEmpty else { return }
+                if let general = categories.first(where: { $0.name == "General" }) {
+                    selectedCategory = general.name
+                } else if let first = categories.first {
+                    selectedCategory = first.name
+                }
+            }
             .overlay {
                 if isLoading {
-                    ProgressView("読み込み中...")
+                    ProgressView("Loading...")
                         .padding()
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
                 }
@@ -61,14 +119,32 @@ struct AddFeedView: View {
         }
     }
 
+    private var trimmedNewCategoryName: String {
+        newCategoryName.trimmingCharacters(in: .whitespaces)
+    }
+
+    private func addCategory() {
+        let name = trimmedNewCategoryName
+        guard !name.isEmpty,
+              !categories.contains(where: { $0.name == name }) else {
+            newCategoryName = ""
+            return
+        }
+        let cat = Category(name: name, sortOrder: categories.count)
+        context.insert(cat)
+        try? context.save()
+        selectedCategory = name
+        newCategoryName = ""
+    }
+
     private func addFeed() async {
         isLoading = true
         errorMessage = nil
         do {
-            try await FeedService.shared.addFeed(url: urlText, category: selectedCategory, context: context)
+            let _ = try await FeedService.shared.addFeed(url: urlText, category: selectedCategory, context: context)
             dismiss()
         } catch {
-            errorMessage = "フィードの取得に失敗しました: \(error.localizedDescription)"
+            errorMessage = "Failed to fetch feed: \(error.localizedDescription)"
         }
         isLoading = false
     }

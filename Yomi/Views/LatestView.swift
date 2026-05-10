@@ -8,6 +8,8 @@ struct LatestView: View {
     @Query private var feeds: [Feed]
 
     @State private var isRefreshing = false
+    @State private var selectedArticle: Article?
+    @State private var showSettings = false
 
     private var featuredArticle: Article? {
         articles.first
@@ -15,20 +17,28 @@ struct LatestView: View {
 
     private var groupedArticles: [(String, [Article])] {
         let rest = featuredArticle != nil ? Array(articles.dropFirst()) : articles
+        let cal = Calendar.current
+        let currentYear = cal.component(.year, from: Date())
+        let shortFormatter = DateFormatter()
+        shortFormatter.dateFormat = "MM/dd"
+        let fullFormatter = DateFormatter()
+        fullFormatter.dateFormat = "yyyy/MM/dd"
         let groups = Dictionary(grouping: rest) { article -> String in
-            let cal = Calendar.current
-            if cal.isDateInToday(article.publishedAt) { return "今日" }
-            if cal.isDateInYesterday(article.publishedAt) { return "昨日" }
-            let formatter = DateFormatter()
-            formatter.dateFormat = "M月d日"
-            return formatter.string(from: article.publishedAt)
+            if cal.isDateInToday(article.publishedAt) { return "Today" }
+            if cal.isDateInYesterday(article.publishedAt) { return "Yesterday" }
+            let year = cal.component(.year, from: article.publishedAt)
+            return year == currentYear
+                ? shortFormatter.string(from: article.publishedAt)
+                : fullFormatter.string(from: article.publishedAt)
         }
-        let order = ["今日", "昨日"]
+        let order = ["Today", "Yesterday"]
         return groups.sorted { a, b in
             let ia = order.firstIndex(of: a.key) ?? Int.max
             let ib = order.firstIndex(of: b.key) ?? Int.max
             if ia != ib { return ia < ib }
-            return a.key > b.key
+            let dateA = a.value.first?.publishedAt ?? .distantPast
+            let dateB = b.value.first?.publishedAt ?? .distantPast
+            return dateA > dateB
         }
     }
 
@@ -37,28 +47,32 @@ struct LatestView: View {
             List {
                 if let featured = featuredArticle {
                     Section {
-                        NavigationLink(value: featured) {
-                            FeaturedArticleCard(article: featured)
-                                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                        }
-                        .listRowSeparator(.hidden)
-                        .buttonStyle(.plain)
+                        articleCardRow(article: featured, featured: true)
                     }
                 }
 
                 ForEach(groupedArticles, id: \.0) { section, sectionArticles in
                     Section(section) {
                         ForEach(sectionArticles) { article in
-                            NavigationLink(value: article) {
-                                ArticleRowView(article: article)
-                            }
-                            .contextMenu { ArticleContextMenu(article: article) }
+                            articleCardRow(article: article, featured: false)
                         }
                     }
                 }
             }
-            .navigationTitle("最新")
-            .navigationDestination(for: Article.self) { article in
+            .navigationTitle("Latest")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gear")
+                    }
+                }
+            }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+            }
+            .navigationDestination(item: $selectedArticle) { article in
                 ArticleWebView(article: article)
             }
             .refreshable {
@@ -73,13 +87,27 @@ struct LatestView: View {
             .overlay {
                 if articles.isEmpty && !isRefreshing {
                     ContentUnavailableView(
-                        "記事がありません",
+                        "No Articles",
                         systemImage: "newspaper",
-                        description: Text("フィードを追加してください")
+                        description: Text("Add a feed to get started")
                     )
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func articleCardRow(article: Article, featured: Bool) -> some View {
+        Button {
+            selectedArticle = article
+        } label: {
+            ArticleRowView(article: article, featured: featured)
+        }
+        .buttonStyle(.plain)
+        .contextMenu { ArticleContextMenu(article: article) }
+        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
     }
 
     private func refresh() async {

@@ -9,12 +9,12 @@ struct ArticleEntry: TimelineEntry {
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> ArticleEntry {
         ArticleEntry(date: .now, articles: [
-            WidgetArticle(id: "1", title: "サンプル記事のタイトルがここに表示されます", feedTitle: "Tech News", url: "", publishedAt: .now),
-            WidgetArticle(id: "2", title: "別のサンプル記事のタイトル", feedTitle: "World", url: "", publishedAt: .now.addingTimeInterval(-3600)),
-            WidgetArticle(id: "3", title: "3つ目のサンプル記事", feedTitle: "Science", url: "", publishedAt: .now.addingTimeInterval(-7200)),
-            WidgetArticle(id: "4", title: "最新テクノロジーの動向を追う", feedTitle: "Tech News", url: "", publishedAt: .now.addingTimeInterval(-10800)),
-            WidgetArticle(id: "5", title: "デザインの新しいトレンド", feedTitle: "Design", url: "", publishedAt: .now.addingTimeInterval(-14400)),
-            WidgetArticle(id: "6", title: "開発ツールのベストプラクティス", feedTitle: "Dev Tools", url: "", publishedAt: .now.addingTimeInterval(-18000)),
+            WidgetArticle(id: "1", title: "Sample article title displayed here", feedTitle: "Tech News", url: "", publishedAt: .now),
+            WidgetArticle(id: "2", title: "Another sample article title", feedTitle: "World", url: "", publishedAt: .now.addingTimeInterval(-3600)),
+            WidgetArticle(id: "3", title: "Third sample article", feedTitle: "Science", url: "", publishedAt: .now.addingTimeInterval(-7200)),
+            WidgetArticle(id: "4", title: "Following the latest technology trends", feedTitle: "Tech News", url: "", publishedAt: .now.addingTimeInterval(-10800)),
+            WidgetArticle(id: "5", title: "New design trends", feedTitle: "Design", url: "", publishedAt: .now.addingTimeInterval(-14400)),
+            WidgetArticle(id: "6", title: "Best practices for dev tools", feedTitle: "Dev Tools", url: "", publishedAt: .now.addingTimeInterval(-18000)),
         ])
     }
 
@@ -87,7 +87,7 @@ struct YomiSmallView: View {
                 Image(systemName: "newspaper")
                     .font(.title2)
                     .foregroundStyle(.tertiary)
-                Text("記事なし")
+                Text("No articles")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -105,7 +105,7 @@ struct YomiMediumView: View {
                 Image(systemName: "newspaper")
                     .font(.title2)
                     .foregroundStyle(.tertiary)
-                Text("記事なし")
+                Text("No articles")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -159,7 +159,7 @@ struct YomiLargeView: View {
                 Image(systemName: "newspaper")
                     .font(.title2)
                     .foregroundStyle(.tertiary)
-                Text("記事なし")
+                Text("No articles")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -233,7 +233,7 @@ struct YomiWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("yomy")
-        .description("最新の記事をホーム画面でチェック")
+        .description("Check the latest articles on your home screen")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
@@ -244,7 +244,7 @@ struct YomiWidget: Widget {
     YomiWidget()
 } timeline: {
     ArticleEntry(date: .now, articles: [
-        WidgetArticle(id: "1", title: "SwiftUI の新機能まとめ 2025", feedTitle: "Swift Blog", url: "", publishedAt: .now.addingTimeInterval(-1800)),
+        WidgetArticle(id: "1", title: "What's New in SwiftUI 2025", feedTitle: "Swift Blog", url: "", publishedAt: .now.addingTimeInterval(-1800)),
     ])
 }
 
@@ -252,9 +252,9 @@ struct YomiWidget: Widget {
     YomiWidget()
 } timeline: {
     ArticleEntry(date: .now, articles: [
-        WidgetArticle(id: "1", title: "SwiftUI の新機能まとめ 2025", feedTitle: "Swift Blog", url: "", publishedAt: .now.addingTimeInterval(-1800)),
-        WidgetArticle(id: "2", title: "Appleが新しいフレームワークを発表", feedTitle: "Tech News", url: "", publishedAt: .now.addingTimeInterval(-3600)),
-        WidgetArticle(id: "3", title: "機械学習の最前線：大規模モデルの動向", feedTitle: "AI Journal", url: "", publishedAt: .now.addingTimeInterval(-7200)),
+        WidgetArticle(id: "1", title: "What's New in SwiftUI 2025", feedTitle: "Swift Blog", url: "", publishedAt: .now.addingTimeInterval(-1800)),
+        WidgetArticle(id: "2", title: "Apple announces a new framework", feedTitle: "Tech News", url: "", publishedAt: .now.addingTimeInterval(-3600)),
+        WidgetArticle(id: "3", title: "ML frontier: large model trends", feedTitle: "AI Journal", url: "", publishedAt: .now.addingTimeInterval(-7200)),
     ])
 }
 
@@ -262,11 +262,11 @@ struct YomiWidget: Widget {
     YomiWidget()
 } timeline: {
     ArticleEntry(date: .now, articles: [
-        WidgetArticle(id: "1", title: "SwiftUI の新機能まとめ 2025", feedTitle: "Swift Blog", url: "", publishedAt: .now.addingTimeInterval(-1800)),
-        WidgetArticle(id: "2", title: "Appleが新しいフレームワークを発表", feedTitle: "Tech News", url: "", publishedAt: .now.addingTimeInterval(-3600)),
-        WidgetArticle(id: "3", title: "機械学習の最前線：大規模モデルの動向", feedTitle: "AI Journal", url: "", publishedAt: .now.addingTimeInterval(-7200)),
-        WidgetArticle(id: "4", title: "Swift 6の並行処理完全ガイド", feedTitle: "Swift Blog", url: "", publishedAt: .now.addingTimeInterval(-10800)),
-        WidgetArticle(id: "5", title: "iOS 19で変わるUXデザインの新潮流", feedTitle: "Design Weekly", url: "", publishedAt: .now.addingTimeInterval(-14400)),
-        WidgetArticle(id: "6", title: "サーバーサイドSwiftの現状と未来", feedTitle: "Backend News", url: "", publishedAt: .now.addingTimeInterval(-18000)),
+        WidgetArticle(id: "1", title: "What's New in SwiftUI 2025", feedTitle: "Swift Blog", url: "", publishedAt: .now.addingTimeInterval(-1800)),
+        WidgetArticle(id: "2", title: "Apple announces a new framework", feedTitle: "Tech News", url: "", publishedAt: .now.addingTimeInterval(-3600)),
+        WidgetArticle(id: "3", title: "ML frontier: large model trends", feedTitle: "AI Journal", url: "", publishedAt: .now.addingTimeInterval(-7200)),
+        WidgetArticle(id: "4", title: "The complete guide to Swift 6 concurrency", feedTitle: "Swift Blog", url: "", publishedAt: .now.addingTimeInterval(-10800)),
+        WidgetArticle(id: "5", title: "New UX design trends in iOS 19", feedTitle: "Design Weekly", url: "", publishedAt: .now.addingTimeInterval(-14400)),
+        WidgetArticle(id: "6", title: "Server-side Swift: present and future", feedTitle: "Backend News", url: "", publishedAt: .now.addingTimeInterval(-18000)),
     ])
 }

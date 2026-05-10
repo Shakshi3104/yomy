@@ -11,7 +11,17 @@ struct YomiApp: App {
         } catch {
             fatalError("Failed to create ModelContainer: \(error)")
         }
+        seedDefaultCategoryIfNeeded()
         BackgroundRefreshService.register()
+    }
+
+    private func seedDefaultCategoryIfNeeded() {
+        let key = "yomy.didSeedDefaultCategory"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        let context = ModelContext(container)
+        context.insert(Category(name: "General", sortOrder: 0))
+        try? context.save()
+        UserDefaults.standard.set(true, forKey: key)
     }
 
     var body: some Scene {

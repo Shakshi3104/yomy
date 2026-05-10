@@ -8,8 +8,8 @@ struct SearchView: View {
     var body: some View {
         NavigationStack {
             SearchResultsView(query: query)
-                .navigationTitle("検索")
-                .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "記事を検索")
+                .navigationTitle("Search")
+                .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search articles")
         }
     }
 }
@@ -18,6 +18,7 @@ private struct SearchResultsView: View {
     let query: String
 
     @Query private var articles: [Article]
+    @State private var selectedArticle: Article?
 
     init(query: String) {
         self.query = query
@@ -38,11 +39,18 @@ private struct SearchResultsView: View {
 
     var body: some View {
         List(articles) { article in
-            NavigationLink(value: article) {
+            Button {
+                selectedArticle = article
+            } label: {
                 ArticleRowView(article: article)
             }
+            .buttonStyle(.plain)
+            .contextMenu { ArticleContextMenu(article: article) }
+            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
         }
-        .navigationDestination(for: Article.self) { article in
+        .navigationDestination(item: $selectedArticle) { article in
             ArticleWebView(article: article)
         }
         .overlay {

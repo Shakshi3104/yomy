@@ -28,12 +28,12 @@ struct FeedsView: View {
                                 Button(role: .destructive) {
                                     try? FeedService.shared.deleteFeed(feed, context: context)
                                 } label: {
-                                    Label("削除", systemImage: "trash")
+                                    Label("Delete", systemImage: "trash")
                                 }
                                 Button {
                                     feedToManage = feed
                                 } label: {
-                                    Label("編集", systemImage: "pencil")
+                                    Label("Edit", systemImage: "pencil")
                                 }
                                 .tint(.blue)
                             }
@@ -41,7 +41,7 @@ struct FeedsView: View {
                     }
                 }
             }
-            .navigationTitle("フィード")
+            .navigationTitle("Feeds")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -60,9 +60,9 @@ struct FeedsView: View {
             .overlay {
                 if feeds.isEmpty {
                     ContentUnavailableView(
-                        "フィードがありません",
+                        "No Feeds",
                         systemImage: "list.bullet",
-                        description: Text("右上の + からフィードを追加してください")
+                        description: Text("Tap + in the top right to add a feed")
                     )
                 }
             }

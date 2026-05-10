@@ -9,10 +9,11 @@ struct SavedView: View {
     ) private var articles: [Article]
 
     @Environment(\.modelContext) private var context
+    @State private var selectedArticle: Article?
 
     private var grouped: [(String, [Article])] {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年M月"
+        formatter.dateFormat = "yyyy/MM"
         let groups = Dictionary(grouping: articles) { article in
             formatter.string(from: article.publishedAt)
         }
@@ -25,31 +26,38 @@ struct SavedView: View {
                 ForEach(grouped, id: \.0) { month, monthArticles in
                     Section(month) {
                         ForEach(monthArticles) { article in
-                            NavigationLink(value: article) {
+                            Button {
+                                selectedArticle = article
+                            } label: {
                                 ArticleRowView(article: article)
                             }
+                            .buttonStyle(.plain)
+                            .contextMenu { ArticleContextMenu(article: article) }
+                            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
                                     article.isSaved = false
                                     try? context.save()
                                 } label: {
-                                    Label("保存解除", systemImage: "bookmark.slash")
+                                    Label("Unsave", systemImage: "bookmark.slash")
                                 }
                             }
                         }
                     }
                 }
             }
-            .navigationTitle("保存済み")
-            .navigationDestination(for: Article.self) { article in
+            .navigationTitle("Saved")
+            .navigationDestination(item: $selectedArticle) { article in
                 ArticleWebView(article: article)
             }
             .overlay {
                 if articles.isEmpty {
                     ContentUnavailableView(
-                        "保存した記事はありません",
+                        "No Saved Articles",
                         systemImage: "bookmark",
-                        description: Text("記事を長押しして「後で読む」で保存できます")
+                        description: Text("Long-press an article and tap Save for Later")
                     )
                 }
             }
