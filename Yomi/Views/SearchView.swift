@@ -8,8 +8,8 @@ struct SearchView: View {
     var body: some View {
         NavigationStack {
             SearchResultsView(query: query)
-                .navigationTitle("検索")
-                .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "記事を検索")
+                .navigationTitle("Search")
+                .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search articles")
         }
     }
 }

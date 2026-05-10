@@ -15,24 +15,24 @@ struct AddFeedView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("フィードURL") {
+                Section("Feed URL") {
                     TextField("https://example.com/feed", text: $urlText)
                         .keyboardType(.URL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 }
 
-                Section("カテゴリ") {
-                    Picker("カテゴリ", selection: $selectedCategory) {
-                        Text("なし").tag("")
+                Section("Category") {
+                    Picker("Category", selection: $selectedCategory) {
+                        Text("None").tag("")
                         ForEach(categories) { cat in
                             Text(cat.name).tag(cat.name)
                         }
                     }
 
                     HStack {
-                        TextField("新しいカテゴリ", text: $newCategoryName)
-                        Button("追加") { addCategory() }
+                        TextField("New category", text: $newCategoryName)
+                        Button("Add") { addCategory() }
                             .disabled(trimmedNewCategoryName.isEmpty)
                     }
                 }
@@ -45,14 +45,14 @@ struct AddFeedView: View {
                     }
                 }
             }
-            .navigationTitle("フィードを追加")
+            .navigationTitle("Add Feed")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") { dismiss() }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("追加") {
+                    Button("Add") {
                         Task { await addFeed() }
                     }
                     .disabled(urlText.isEmpty || isLoading)
@@ -68,7 +68,7 @@ struct AddFeedView: View {
             }
             .overlay {
                 if isLoading {
-                    ProgressView("読み込み中...")
+                    ProgressView("Loading...")
                         .padding()
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
                 }
@@ -98,7 +98,7 @@ struct AddFeedView: View {
             let _ = try await FeedService.shared.addFeed(url: urlText, category: selectedCategory, context: context)
             dismiss()
         } catch {
-            errorMessage = "フィードの取得に失敗しました: \(error.localizedDescription)"
+            errorMessage = "Failed to fetch feed: \(error.localizedDescription)"
         }
         isLoading = false
     }

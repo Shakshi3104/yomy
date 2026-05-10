@@ -22,7 +22,7 @@ struct SettingsView: View {
                 opmlSection
                 aboutSection
             }
-            .navigationTitle("設定")
+            .navigationTitle("Settings")
             .fileImporter(
                 isPresented: $showOPMLImporter,
                 allowedContentTypes: [.xml, UTType("public.opml") ?? .xml]
@@ -35,20 +35,20 @@ struct SettingsView: View {
                 contentType: .xml,
                 defaultFilename: "yomi-feeds.opml"
             ) { _ in }
-            .alert("インポート完了", isPresented: $showImportResult) {
+            .alert("Import Complete", isPresented: $showImportResult) {
                 Button("OK") {}
             } message: {
                 if let err = importError {
                     Text(err)
                 } else {
-                    Text("\(importSuccessCount) 件のフィードを追加しました")
+                    Text("Added \(importSuccessCount) feeds")
                 }
             }
         }
     }
 
     private var categoriesSection: some View {
-        Section("カテゴリ") {
+        Section("Categories") {
             ForEach(categories) { category in
                 Text(category.name)
             }
@@ -60,8 +60,8 @@ struct SettingsView: View {
             }
 
             HStack {
-                TextField("新しいカテゴリ", text: $newCategoryName)
-                Button("追加") {
+                TextField("New category", text: $newCategoryName)
+                Button("Add") {
                     guard !newCategoryName.isEmpty else { return }
                     let cat = Category(name: newCategoryName, sortOrder: categories.count)
                     context.insert(cat)
@@ -79,20 +79,20 @@ struct SettingsView: View {
                 opmlExportContent = OPMLManager.shared.exportOPML(feeds: feeds)
                 showOPMLExporter = true
             } label: {
-                Label("フィードをエクスポート", systemImage: "square.and.arrow.up")
+                Label("Export Feeds", systemImage: "square.and.arrow.up")
             }
 
             Button {
                 showOPMLImporter = true
             } label: {
-                Label("OPMLをインポート", systemImage: "square.and.arrow.down")
+                Label("Import OPML", systemImage: "square.and.arrow.down")
             }
         }
     }
 
     private var aboutSection: some View {
-        Section("アプリ情報") {
-            LabeledContent("バージョン") {
+        Section("About") {
+            LabeledContent("Version") {
                 Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
             }
         }

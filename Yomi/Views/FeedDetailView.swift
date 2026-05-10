@@ -29,12 +29,12 @@ struct FeedDetailView: View {
                     Button {
                         try? FeedService.shared.markAllRead(feed: feed, context: context)
                     } label: {
-                        Label("すべて既読", systemImage: "checkmark.circle")
+                        Label("Mark All Read", systemImage: "checkmark.circle")
                     }
                     Button {
                         Task { try? await FeedService.shared.refresh(feed: feed, context: context) }
                     } label: {
-                        Label("更新", systemImage: "arrow.clockwise")
+                        Label("Refresh", systemImage: "arrow.clockwise")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
@@ -46,7 +46,7 @@ struct FeedDetailView: View {
         }
         .overlay {
             if sortedArticles.isEmpty {
-                ContentUnavailableView("記事がありません", systemImage: "doc.text")
+                ContentUnavailableView("No Articles", systemImage: "doc.text")
             }
         }
     }

@@ -12,7 +12,7 @@ struct SavedView: View {
 
     private var grouped: [(String, [Article])] {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy年M月"
+        formatter.dateFormat = "yyyy/MM"
         let groups = Dictionary(grouping: articles) { article in
             formatter.string(from: article.publishedAt)
         }
@@ -33,23 +33,23 @@ struct SavedView: View {
                                     article.isSaved = false
                                     try? context.save()
                                 } label: {
-                                    Label("保存解除", systemImage: "bookmark.slash")
+                                    Label("Unsave", systemImage: "bookmark.slash")
                                 }
                             }
                         }
                     }
                 }
             }
-            .navigationTitle("保存済み")
+            .navigationTitle("Saved")
             .navigationDestination(for: Article.self) { article in
                 ArticleWebView(article: article)
             }
             .overlay {
                 if articles.isEmpty {
                     ContentUnavailableView(
-                        "保存した記事はありません",
+                        "No Saved Articles",
                         systemImage: "bookmark",
-                        description: Text("記事を長押しして「後で読む」で保存できます")
+                        description: Text("Long-press an article and tap Save for Later")
                     )
                 }
             }

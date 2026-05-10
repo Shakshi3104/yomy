@@ -10,7 +10,7 @@ struct ArticleContextMenu: View {
             try? context.save()
         } label: {
             Label(
-                article.isSaved ? "保存を解除" : "後で読む",
+                article.isSaved ? "Unsave" : "Save for Later",
                 systemImage: article.isSaved ? "bookmark.slash" : "bookmark"
             )
         }
@@ -20,7 +20,7 @@ struct ArticleContextMenu: View {
             try? context.save()
         } label: {
             Label(
-                article.isRead ? "未読にする" : "既読にする",
+                article.isRead ? "Mark as Unread" : "Mark as Read",
                 systemImage: article.isRead ? "envelope.badge" : "checkmark"
             )
         }
@@ -28,7 +28,7 @@ struct ArticleContextMenu: View {
         Divider()
 
         ShareLink(item: URL(string: article.url)!) {
-            Label("共有", systemImage: "square.and.arrow.up")
+            Label("Share", systemImage: "square.and.arrow.up")
         }
     }
 }

@@ -7,27 +7,27 @@ struct ContentView: View {
         TabView {
             LatestView()
                 .tabItem {
-                    Label("最新", systemImage: "newspaper")
+                    Label("Latest", systemImage: "newspaper")
                 }
 
             FeedsView()
                 .tabItem {
-                    Label("フィード", systemImage: "list.bullet")
+                    Label("Feeds", systemImage: "list.bullet")
                 }
 
             SavedView()
                 .tabItem {
-                    Label("保存済み", systemImage: "bookmark")
+                    Label("Saved", systemImage: "bookmark")
                 }
 
             SearchView()
                 .tabItem {
-                    Label("検索", systemImage: "magnifyingglass")
+                    Label("Search", systemImage: "magnifyingglass")
                 }
 
             SettingsView()
                 .tabItem {
-                    Label("設定", systemImage: "gear")
+                    Label("Settings", systemImage: "gear")
                 }
         }
         .onOpenURL { url in
@@ -48,7 +48,7 @@ struct ContentView: View {
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
-                                Button("閉じる") { widgetURL = nil }
+                                Button("Close") { widgetURL = nil }
                             }
                         }
                 }

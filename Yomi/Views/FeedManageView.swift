@@ -18,8 +18,8 @@ struct FeedManageView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("フィード情報") {
-                    LabeledContent("タイトル", value: feed.title)
+                Section("Feed Info") {
+                    LabeledContent("Title", value: feed.title)
                     LabeledContent("URL") {
                         Text(feed.url)
                             .font(.footnote)
@@ -28,29 +28,29 @@ struct FeedManageView: View {
                     }
                 }
 
-                Section("カテゴリ") {
-                    Picker("カテゴリ", selection: $selectedCategory) {
-                        Text("なし").tag("")
+                Section("Category") {
+                    Picker("Category", selection: $selectedCategory) {
+                        Text("None").tag("")
                         ForEach(categories) { cat in
                             Text(cat.name).tag(cat.name)
                         }
                     }
 
                     HStack {
-                        TextField("新しいカテゴリ", text: $newCategoryName)
-                        Button("追加") { addCategory() }
+                        TextField("New category", text: $newCategoryName)
+                        Button("Add") { addCategory() }
                             .disabled(trimmedNewCategoryName.isEmpty)
                     }
                 }
             }
-            .navigationTitle("フィードを編集")
+            .navigationTitle("Edit Feed")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") { dismiss() }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    Button("Save") {
                         feed.category = selectedCategory
                         try? context.save()
                         dismiss()

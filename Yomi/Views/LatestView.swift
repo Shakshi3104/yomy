@@ -15,15 +15,15 @@ struct LatestView: View {
 
     private var groupedArticles: [(String, [Article])] {
         let rest = featuredArticle != nil ? Array(articles.dropFirst()) : articles
+        let cal = Calendar.current
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd"
         let groups = Dictionary(grouping: rest) { article -> String in
-            let cal = Calendar.current
-            if cal.isDateInToday(article.publishedAt) { return "今日" }
-            if cal.isDateInYesterday(article.publishedAt) { return "昨日" }
-            let formatter = DateFormatter()
-            formatter.dateFormat = "M月d日"
+            if cal.isDateInToday(article.publishedAt) { return "Today" }
+            if cal.isDateInYesterday(article.publishedAt) { return "Yesterday" }
             return formatter.string(from: article.publishedAt)
         }
-        let order = ["今日", "昨日"]
+        let order = ["Today", "Yesterday"]
         return groups.sorted { a, b in
             let ia = order.firstIndex(of: a.key) ?? Int.max
             let ib = order.firstIndex(of: b.key) ?? Int.max
@@ -57,7 +57,7 @@ struct LatestView: View {
                     }
                 }
             }
-            .navigationTitle("最新")
+            .navigationTitle("Latest")
             .navigationDestination(for: Article.self) { article in
                 ArticleWebView(article: article)
             }
@@ -73,9 +73,9 @@ struct LatestView: View {
             .overlay {
                 if articles.isEmpty && !isRefreshing {
                     ContentUnavailableView(
-                        "記事がありません",
+                        "No Articles",
                         systemImage: "newspaper",
-                        description: Text("フィードを追加してください")
+                        description: Text("Add a feed to get started")
                     )
                 }
             }
