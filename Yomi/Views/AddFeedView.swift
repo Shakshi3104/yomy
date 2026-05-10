@@ -8,8 +8,6 @@ struct AddFeedView: View {
 
     @State private var urlText = ""
     @State private var selectedCategory = ""
-    @State private var newCategoryName = ""
-    @State private var showNewCategoryAlert = false
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -30,46 +28,7 @@ struct AddFeedView: View {
                     }
                 }
 
-                Section("Category") {
-                    Menu {
-                        Button {
-                            selectedCategory = ""
-                        } label: {
-                            if selectedCategory.isEmpty {
-                                Label("None", systemImage: "checkmark")
-                            } else {
-                                Text("None")
-                            }
-                        }
-                        ForEach(categories) { cat in
-                            Button {
-                                selectedCategory = cat.name
-                            } label: {
-                                if selectedCategory == cat.name {
-                                    Label(cat.name, systemImage: "checkmark")
-                                } else {
-                                    Text(cat.name)
-                                }
-                            }
-                        }
-                        Divider()
-                        Button {
-                            showNewCategoryAlert = true
-                        } label: {
-                            Label("New Category...", systemImage: "plus.circle")
-                        }
-                    } label: {
-                        HStack {
-                            Text(selectedCategory.isEmpty ? "None" : selectedCategory)
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .tint(.primary)
-                }
+                CategoryPickerSection(selectedCategory: $selectedCategory)
 
                 if let errorMessage {
                     Section {
@@ -92,15 +51,6 @@ struct AddFeedView: View {
                     .disabled(urlText.isEmpty || isLoading)
                 }
             }
-            .alert("New Category", isPresented: $showNewCategoryAlert) {
-                TextField("Category name", text: $newCategoryName)
-                    .textInputAutocapitalization(.words)
-                Button("Add") { addCategory() }
-                    .disabled(trimmedNewCategoryName.isEmpty)
-                Button("Cancel", role: .cancel) {
-                    newCategoryName = ""
-                }
-            }
             .onAppear {
                 guard selectedCategory.isEmpty else { return }
                 if let general = categories.first(where: { $0.name == "General" }) {
@@ -117,24 +67,6 @@ struct AddFeedView: View {
                 }
             }
         }
-    }
-
-    private var trimmedNewCategoryName: String {
-        newCategoryName.trimmingCharacters(in: .whitespaces)
-    }
-
-    private func addCategory() {
-        let name = trimmedNewCategoryName
-        guard !name.isEmpty,
-              !categories.contains(where: { $0.name == name }) else {
-            newCategoryName = ""
-            return
-        }
-        let cat = Category(name: name, sortOrder: categories.count)
-        context.insert(cat)
-        try? context.save()
-        selectedCategory = name
-        newCategoryName = ""
     }
 
     private func addFeed() async {

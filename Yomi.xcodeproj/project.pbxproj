@@ -17,6 +17,7 @@
 		29132B6FB84FC51AA6E34E84 /* ArticleContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0433804E832D2E6A378F503B /* ArticleContextMenu.swift */; };
 		2F89F234641A2CF9F707E8EB /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B5D01EC8ADF85FD2BD4C6D6 /* Article.swift */; };
 		3B7E948683250D569C16B004 /* RSSFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = D912FB6EDE7FB28B88D4C35F /* RSSFetcher.swift */; };
+		C1C0FFEE5EC7A0BABE5EC701 /* CategoryPickerSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1C0FFEE5EC7A0BABE5EC700 /* CategoryPickerSection.swift */; };
 		481B888D93A391904382092E /* ArticleRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3FDDB2FB7D493C42AEC3F37 /* ArticleRowView.swift */; };
 		4B4EEBC63BAFFD07CC326D43 /* LatestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BB0C1AB154AB2E1EDF278B3 /* LatestView.swift */; };
 		4CB08D92CFE942C65BA98DAE /* YomiWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AF09DE22B595F75BE36A715A /* YomiWidget.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -89,6 +90,7 @@
 		8B92106D2BCCDE5451812493 /* Feed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feed.swift; sourceTree = "<group>"; };
 		8C85B778AE190480F969669E /* Yomi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yomi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D1FAF476B012BC57218C70E /* CachedAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedAsyncImage.swift; sourceTree = "<group>"; };
+		C1C0FFEE5EC7A0BABE5EC700 /* CategoryPickerSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryPickerSection.swift; sourceTree = "<group>"; };
 		9B4FEF5925A963691B0CAF9C /* YomiWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = YomiWidget.entitlements; sourceTree = "<group>"; };
 		A0F6415159792D42B57ECC98 /* BackgroundRefreshService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshService.swift; sourceTree = "<group>"; };
 		AF09DE22B595F75BE36A715A /* YomiWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = YomiWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -233,6 +235,7 @@
 				0433804E832D2E6A378F503B /* ArticleContextMenu.swift */,
 				F3FDDB2FB7D493C42AEC3F37 /* ArticleRowView.swift */,
 				8D1FAF476B012BC57218C70E /* CachedAsyncImage.swift */,
+				C1C0FFEE5EC7A0BABE5EC700 /* CategoryPickerSection.swift */,
 				4C9DDDCEA40E5FFCBF658213 /* FeedRowView.swift */,
 			);
 			path = Components;
@@ -356,6 +359,7 @@
 				FAA49602D07209D0599FB1EE /* BackgroundRefreshService.swift in Sources */,
 				8117032E657135F335027889 /* CachedAsyncImage.swift in Sources */,
 				06C9252A7E0A95F80CF8B89B /* Category.swift in Sources */,
+				C1C0FFEE5EC7A0BABE5EC701 /* CategoryPickerSection.swift in Sources */,
 				158416DBA557DB7A6040D8E9 /* ContentView.swift in Sources */,
 				D492249C726AC6153890BCB3 /* Feed.swift in Sources */,
 				CE696972B86ADC6341971F3F /* FeedDetailView.swift in Sources */,
