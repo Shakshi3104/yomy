@@ -36,7 +36,9 @@ struct LatestView: View {
             let ia = order.firstIndex(of: a.key) ?? Int.max
             let ib = order.firstIndex(of: b.key) ?? Int.max
             if ia != ib { return ia < ib }
-            return a.key > b.key
+            let dateA = a.value.first?.publishedAt ?? .distantPast
+            let dateB = b.value.first?.publishedAt ?? .distantPast
+            return dateA > dateB
         }
     }
 
