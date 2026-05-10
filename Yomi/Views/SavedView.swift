@@ -9,7 +9,6 @@ struct SavedView: View {
     ) private var articles: [Article]
 
     @Environment(\.modelContext) private var context
-    @State private var showSettings = false
 
     private var grouped: [(String, [Article])] {
         let formatter = DateFormatter()
@@ -42,18 +41,6 @@ struct SavedView: View {
                 }
             }
             .navigationTitle("Saved")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Image(systemName: "gear")
-                    }
-                }
-            }
-            .sheet(isPresented: $showSettings) {
-                SettingsView()
-            }
             .navigationDestination(for: Article.self) { article in
                 ArticleWebView(article: article)
             }
