@@ -83,9 +83,11 @@ struct SettingsView: View {
     }
 
     private var aboutSection: some View {
-        Section("About") {
-            LabeledContent("Version") {
-                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
+        Section {
+            NavigationLink {
+                AboutView()
+            } label: {
+                Text("About")
             }
         }
     }
