@@ -8,6 +8,7 @@ struct FeedManageView: View {
     @Query(sort: \Category.sortOrder) private var categories: [Category]
 
     @State private var selectedCategory: String
+    @State private var newCategoryName = ""
 
     init(feed: Feed) {
         self.feed = feed
@@ -29,10 +30,16 @@ struct FeedManageView: View {
 
                 Section("カテゴリ") {
                     Picker("カテゴリ", selection: $selectedCategory) {
-                        Text("General").tag("General")
+                        Text("なし").tag("")
                         ForEach(categories) { cat in
                             Text(cat.name).tag(cat.name)
                         }
+                    }
+
+                    HStack {
+                        TextField("新しいカテゴリ", text: $newCategoryName)
+                        Button("追加") { addCategory() }
+                            .disabled(trimmedNewCategoryName.isEmpty)
                     }
                 }
             }
@@ -51,5 +58,20 @@ struct FeedManageView: View {
                 }
             }
         }
+    }
+
+    private var trimmedNewCategoryName: String {
+        newCategoryName.trimmingCharacters(in: .whitespaces)
+    }
+
+    private func addCategory() {
+        let name = trimmedNewCategoryName
+        guard !name.isEmpty,
+              !categories.contains(where: { $0.name == name }) else { return }
+        let cat = Category(name: name, sortOrder: categories.count)
+        context.insert(cat)
+        try? context.save()
+        selectedCategory = name
+        newCategoryName = ""
     }
 }

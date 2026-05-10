@@ -7,7 +7,8 @@ struct AddFeedView: View {
     @Query(sort: \Category.sortOrder) private var categories: [Category]
 
     @State private var urlText = ""
-    @State private var selectedCategory = "General"
+    @State private var selectedCategory = ""
+    @State private var newCategoryName = ""
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -23,10 +24,16 @@ struct AddFeedView: View {
 
                 Section("カテゴリ") {
                     Picker("カテゴリ", selection: $selectedCategory) {
-                        Text("General").tag("General")
+                        Text("なし").tag("")
                         ForEach(categories) { cat in
                             Text(cat.name).tag(cat.name)
                         }
+                    }
+
+                    HStack {
+                        TextField("新しいカテゴリ", text: $newCategoryName)
+                        Button("追加") { addCategory() }
+                            .disabled(trimmedNewCategoryName.isEmpty)
                     }
                 }
 
@@ -51,6 +58,14 @@ struct AddFeedView: View {
                     .disabled(urlText.isEmpty || isLoading)
                 }
             }
+            .onAppear {
+                guard selectedCategory.isEmpty else { return }
+                if let general = categories.first(where: { $0.name == "General" }) {
+                    selectedCategory = general.name
+                } else if let first = categories.first {
+                    selectedCategory = first.name
+                }
+            }
             .overlay {
                 if isLoading {
                     ProgressView("読み込み中...")
@@ -61,11 +76,26 @@ struct AddFeedView: View {
         }
     }
 
+    private var trimmedNewCategoryName: String {
+        newCategoryName.trimmingCharacters(in: .whitespaces)
+    }
+
+    private func addCategory() {
+        let name = trimmedNewCategoryName
+        guard !name.isEmpty,
+              !categories.contains(where: { $0.name == name }) else { return }
+        let cat = Category(name: name, sortOrder: categories.count)
+        context.insert(cat)
+        try? context.save()
+        selectedCategory = name
+        newCategoryName = ""
+    }
+
     private func addFeed() async {
         isLoading = true
         errorMessage = nil
         do {
-            try await FeedService.shared.addFeed(url: urlText, category: selectedCategory, context: context)
+            let _ = try await FeedService.shared.addFeed(url: urlText, category: selectedCategory, context: context)
             dismiss()
         } catch {
             errorMessage = "フィードの取得に失敗しました: \(error.localizedDescription)"
