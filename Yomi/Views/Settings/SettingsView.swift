@@ -8,7 +8,6 @@ struct SettingsView: View {
     @Query(sort: \Category.sortOrder) private var categories: [Category]
     @Query private var feeds: [Feed]
 
-    @State private var newCategoryName = ""
     @State private var showOPMLImporter = false
     @State private var showOPMLExporter = false
     @State private var opmlExportContent = ""
@@ -54,27 +53,14 @@ struct SettingsView: View {
     }
 
     private var categoriesSection: some View {
-        Section("Categories") {
-            ForEach(categories) { category in
-                Text(category.name)
-            }
-            .onDelete { indexSet in
-                for index in indexSet {
-                    context.delete(categories[index])
+        Section {
+            NavigationLink {
+                CategoriesView()
+            } label: {
+                LabeledContent("Categories") {
+                    Text("\(categories.count)")
+                        .foregroundStyle(.secondary)
                 }
-                try? context.save()
-            }
-
-            HStack {
-                TextField("New category", text: $newCategoryName)
-                Button("Add") {
-                    guard !newCategoryName.isEmpty else { return }
-                    let cat = Category(name: newCategoryName, sortOrder: categories.count)
-                    context.insert(cat)
-                    try? context.save()
-                    newCategoryName = ""
-                }
-                .disabled(newCategoryName.isEmpty)
             }
         }
     }
@@ -97,9 +83,11 @@ struct SettingsView: View {
     }
 
     private var aboutSection: some View {
-        Section("About") {
-            LabeledContent("Version") {
-                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—")
+        Section {
+            NavigationLink {
+                AboutView()
+            } label: {
+                Text("About")
             }
         }
     }
