@@ -34,6 +34,7 @@ struct ArticleWebView: View {
                 if !article.isRead {
                     article.isRead = true
                     try? context.save()
+                    FeedService.shared.updateWidgetSnapshot(context: context)
                 }
             }
     }

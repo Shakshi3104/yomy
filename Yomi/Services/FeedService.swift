@@ -80,11 +80,12 @@ final class FeedService {
                 }
             }
         }
-        saveWidgetData(context: context)
+        updateWidgetSnapshot(context: context)
     }
 
-    private func saveWidgetData(context: ModelContext) {
+    func updateWidgetSnapshot(context: ModelContext) {
         let descriptor = FetchDescriptor<Article>(
+            predicate: #Predicate { !$0.isRead },
             sortBy: [SortDescriptor(\.publishedAt, order: .reverse)]
         )
         guard let articles = try? context.fetch(descriptor) else { return }
@@ -188,5 +189,6 @@ final class FeedService {
             article.isRead = true
         }
         try context.save()
+        updateWidgetSnapshot(context: context)
     }
 }
