@@ -1,8 +1,10 @@
 import Foundation
+import OSLog
 import SwiftData
 import WidgetKit
 
 private let ogFetchConcurrency = 5
+private let widgetLog = Logger(subsystem: "com.shakshi.yomy", category: "Widget")
 
 @MainActor
 final class FeedService {
@@ -85,11 +87,15 @@ final class FeedService {
 
     func updateWidgetSnapshot(context: ModelContext) {
         let descriptor = FetchDescriptor<Article>(
-            predicate: #Predicate { !$0.isRead },
             sortBy: [SortDescriptor(\.publishedAt, order: .reverse)]
         )
-        guard let articles = try? context.fetch(descriptor) else { return }
-        let top = Array(articles.prefix(10))
+        guard let allArticles = try? context.fetch(descriptor) else {
+            widgetLog.error("updateWidgetSnapshot: fetch failed")
+            return
+        }
+        let unread = allArticles.filter { !$0.isRead }
+        let top = Array(unread.prefix(10))
+        widgetLog.info("updateWidgetSnapshot: total=\(allArticles.count) unread=\(unread.count) snapshot=\(top.count)")
         let widgetArticles = top.map { article in
             WidgetArticle(
                 id: article.id.uuidString,
@@ -105,7 +111,10 @@ final class FeedService {
         let keepIDs = Set(widgetArticles.map(\.id))
         WidgetDataStore.cleanUpImages(keeping: keepIDs)
 
-        WidgetCenter.shared.reloadAllTimelines()
+        let reloaded = WidgetDataStore.load()
+        widgetLog.info("updateWidgetSnapshot: wrote=\(widgetArticles.count) reloaded=\(reloaded.count)")
+
+        WidgetCenter.shared.reloadTimelines(ofKind: "YomiWidget")
 
         let imageJobs: [(id: String, url: URL)] = top.compactMap { article in
             let id = article.id.uuidString
@@ -126,7 +135,7 @@ final class FeedService {
                     }
                 }
             }
-            WidgetCenter.shared.reloadAllTimelines()
+            WidgetCenter.shared.reloadTimelines(ofKind: "YomiWidget")
         }
     }
 
