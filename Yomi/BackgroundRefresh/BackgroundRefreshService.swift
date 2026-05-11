@@ -14,24 +14,31 @@ final class BackgroundRefreshService {
     static func schedule() {
         let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
         request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
-        try? BGTaskScheduler.shared.submit(request)
+        do {
+            try BGTaskScheduler.shared.submit(request)
+        } catch {
+            print("[BackgroundRefresh] schedule failed: \(error)")
+        }
     }
 
     private static func handleAppRefresh(task: BGAppRefreshTask) {
         schedule()
 
-        task.expirationHandler = { task.setTaskCompleted(success: false) }
-
-        Task {
+        let work = Task {
             do {
                 let container = try ModelContainer(for: Feed.self, Article.self, Category.self)
                 let context = ModelContext(container)
                 let feeds = try context.fetch(FetchDescriptor<Feed>())
                 await FeedService.shared.refreshAll(feeds: feeds, context: context)
-                task.setTaskCompleted(success: true)
+                task.setTaskCompleted(success: !Task.isCancelled)
             } catch {
+                print("[BackgroundRefresh] refresh failed: \(error)")
                 task.setTaskCompleted(success: false)
             }
+        }
+
+        task.expirationHandler = {
+            work.cancel()
         }
     }
 }

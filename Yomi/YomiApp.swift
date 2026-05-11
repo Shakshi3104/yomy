@@ -13,6 +13,7 @@ struct YomiApp: App {
         }
         seedDefaultCategoryIfNeeded()
         BackgroundRefreshService.register()
+        BackgroundRefreshService.schedule()
     }
 
     private func seedDefaultCategoryIfNeeded() {
