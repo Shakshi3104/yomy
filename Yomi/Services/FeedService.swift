@@ -105,15 +105,24 @@ final class FeedService {
         let keepIDs = Set(widgetArticles.map(\.id))
         WidgetDataStore.cleanUpImages(keeping: keepIDs)
 
+        WidgetCenter.shared.reloadAllTimelines()
+
+        let imageJobs: [(id: String, url: URL)] = top.compactMap { article in
+            let id = article.id.uuidString
+            guard let urlString = article.imageURL,
+                  let url = URL(string: urlString),
+                  WidgetDataStore.loadImage(for: id) == nil else { return nil }
+            return (id, url)
+        }
+
+        if imageJobs.isEmpty { return }
+
         Task.detached {
             await withTaskGroup(of: Void.self) { group in
-                for article in top {
-                    guard let urlString = article.imageURL,
-                          let url = URL(string: urlString) else { continue }
-                    if WidgetDataStore.loadImage(for: article.id.uuidString) != nil { continue }
+                for job in imageJobs {
                     group.addTask {
-                        guard let (data, _) = try? await URLSession.shared.data(from: url) else { return }
-                        WidgetDataStore.cacheImage(data: data, for: article.id.uuidString)
+                        guard let (data, _) = try? await URLSession.shared.data(from: job.url) else { return }
+                        WidgetDataStore.cacheImage(data: data, for: job.id)
                     }
                 }
             }
