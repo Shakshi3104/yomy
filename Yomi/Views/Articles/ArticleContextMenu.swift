@@ -18,6 +18,7 @@ struct ArticleContextMenu: View {
         Button {
             article.isRead.toggle()
             try? context.save()
+            FeedService.shared.updateWidgetSnapshot(context: context)
         } label: {
             Label(
                 article.isRead ? "Mark as Unread" : "Mark as Read",

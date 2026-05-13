@@ -1,8 +1,10 @@
 import Foundation
+import OSLog
 import SwiftData
 import WidgetKit
 
 private let ogFetchConcurrency = 5
+private let widgetLog = Logger(subsystem: "com.shakshi.yomy", category: "Widget")
 
 @MainActor
 final class FeedService {
@@ -80,15 +82,20 @@ final class FeedService {
                 }
             }
         }
-        saveWidgetData(context: context)
+        updateWidgetSnapshot(context: context)
     }
 
-    private func saveWidgetData(context: ModelContext) {
+    func updateWidgetSnapshot(context: ModelContext) {
         let descriptor = FetchDescriptor<Article>(
             sortBy: [SortDescriptor(\.publishedAt, order: .reverse)]
         )
-        guard let articles = try? context.fetch(descriptor) else { return }
-        let top = Array(articles.prefix(10))
+        guard let allArticles = try? context.fetch(descriptor) else {
+            widgetLog.error("updateWidgetSnapshot: fetch failed")
+            return
+        }
+        let unread = allArticles.filter { !$0.isRead }
+        let top = Array(unread.prefix(10))
+        widgetLog.info("updateWidgetSnapshot: total=\(allArticles.count) unread=\(unread.count) snapshot=\(top.count)")
         let widgetArticles = top.map { article in
             WidgetArticle(
                 id: article.id.uuidString,
@@ -104,19 +111,31 @@ final class FeedService {
         let keepIDs = Set(widgetArticles.map(\.id))
         WidgetDataStore.cleanUpImages(keeping: keepIDs)
 
+        let reloaded = WidgetDataStore.load()
+        widgetLog.info("updateWidgetSnapshot: wrote=\(widgetArticles.count) reloaded=\(reloaded.count)")
+
+        WidgetCenter.shared.reloadTimelines(ofKind: "YomiWidget")
+
+        let imageJobs: [(id: String, url: URL)] = top.compactMap { article in
+            let id = article.id.uuidString
+            guard let urlString = article.imageURL,
+                  let url = URL(string: urlString),
+                  WidgetDataStore.loadImage(for: id) == nil else { return nil }
+            return (id, url)
+        }
+
+        if imageJobs.isEmpty { return }
+
         Task.detached {
             await withTaskGroup(of: Void.self) { group in
-                for article in top {
-                    guard let urlString = article.imageURL,
-                          let url = URL(string: urlString) else { continue }
-                    if WidgetDataStore.loadImage(for: article.id.uuidString) != nil { continue }
+                for job in imageJobs {
                     group.addTask {
-                        guard let (data, _) = try? await URLSession.shared.data(from: url) else { return }
-                        WidgetDataStore.cacheImage(data: data, for: article.id.uuidString)
+                        guard let (data, _) = try? await URLSession.shared.data(from: job.url) else { return }
+                        WidgetDataStore.cacheImage(data: data, for: job.id)
                     }
                 }
             }
-            WidgetCenter.shared.reloadAllTimelines()
+            WidgetCenter.shared.reloadTimelines(ofKind: "YomiWidget")
         }
     }
 
@@ -188,5 +207,6 @@ final class FeedService {
             article.isRead = true
         }
         try context.save()
+        updateWidgetSnapshot(context: context)
     }
 }
