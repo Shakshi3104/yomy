@@ -108,7 +108,7 @@ private struct CategoryChip: View {
         .padding(.vertical, 8)
         .background(
             Capsule()
-                .fill(Color(uiColor: .systemBackground))
+                .fill(Color(uiColor: .secondarySystemGroupedBackground))
                 .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         )
     }
