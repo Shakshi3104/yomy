@@ -10,12 +10,30 @@ struct LatestView: View {
     @State private var selectedArticle: Article?
     @State private var showSettings = false
 
+    private var dedupedArticles: [Article] {
+        FeedService.dedupByURL(articles)
+    }
+
+    private var siblingCountsByURL: [String: Int] {
+        var counts: [String: Int] = [:]
+        for article in articles where !article.url.isEmpty {
+            counts[article.url, default: 0] += 1
+        }
+        return counts
+    }
+
+    private func additionalFeedCount(for article: Article) -> Int {
+        guard !article.url.isEmpty else { return 0 }
+        return max(0, (siblingCountsByURL[article.url] ?? 1) - 1)
+    }
+
     private var featuredArticle: Article? {
-        articles.first
+        dedupedArticles.first
     }
 
     private var groupedArticles: [(String, [Article])] {
-        let rest = featuredArticle != nil ? Array(articles.dropFirst()) : articles
+        let deduped = dedupedArticles
+        let rest = featuredArticle != nil ? Array(deduped.dropFirst()) : deduped
         let cal = Calendar.current
         let currentYear = cal.component(.year, from: Date())
         let shortFormatter = DateFormatter()
@@ -102,7 +120,11 @@ struct LatestView: View {
         Button {
             selectedArticle = article
         } label: {
-            ArticleRowView(article: article, featured: featured)
+            ArticleRowView(
+                article: article,
+                featured: featured,
+                additionalFeedCount: additionalFeedCount(for: article)
+            )
         }
         .buttonStyle(.plain)
         .contextMenu { ArticleContextMenu(article: article) }

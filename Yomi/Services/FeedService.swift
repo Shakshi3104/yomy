@@ -211,7 +211,7 @@ final class FeedService {
         updateWidgetSnapshot(context: context)
     }
 
-    private static func dedupByURL(_ articles: [Article]) -> [Article] {
+    static func dedupByURL(_ articles: [Article]) -> [Article] {
         var seen = Set<String>()
         var result: [Article] = []
         result.reserveCapacity(articles.count)
@@ -225,5 +225,33 @@ final class FeedService {
             }
         }
         return result
+    }
+
+    func setRead(article: Article, isRead: Bool, context: ModelContext) {
+        applyToSiblings(of: article, context: context) { $0.isRead = isRead }
+        try? context.save()
+        updateWidgetSnapshot(context: context)
+    }
+
+    func setSaved(article: Article, isSaved: Bool, context: ModelContext) {
+        applyToSiblings(of: article, context: context) { $0.isSaved = isSaved }
+        try? context.save()
+    }
+
+    private func applyToSiblings(
+        of article: Article,
+        context: ModelContext,
+        _ body: (Article) -> Void
+    ) {
+        let url = article.url
+        guard !url.isEmpty else {
+            body(article)
+            return
+        }
+        let descriptor = FetchDescriptor<Article>(predicate: #Predicate { $0.url == url })
+        let siblings = (try? context.fetch(descriptor)) ?? [article]
+        for sibling in siblings {
+            body(sibling)
+        }
     }
 }

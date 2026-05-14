@@ -16,8 +16,7 @@ struct ArticleWebView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        article.isSaved.toggle()
-                        try? context.save()
+                        FeedService.shared.setSaved(article: article, isSaved: !article.isSaved, context: context)
                     } label: {
                         Image(systemName: article.isSaved ? "bookmark.fill" : "bookmark")
                     }
@@ -32,9 +31,7 @@ struct ArticleWebView: View {
             }
             .onAppear {
                 if !article.isRead {
-                    article.isRead = true
-                    try? context.save()
-                    FeedService.shared.updateWidgetSnapshot(context: context)
+                    FeedService.shared.setRead(article: article, isRead: true, context: context)
                 }
             }
     }
