@@ -5,76 +5,41 @@ struct LatestView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Article.publishedAt, order: .reverse) private var articles: [Article]
     @Query private var feeds: [Feed]
+    @Query(sort: \Category.sortOrder) private var categories: [Category]
 
     @State private var isRefreshing = false
     @State private var selectedArticle: Article?
     @State private var showSettings = false
 
-    private var dedupedArticles: [Article] {
-        FeedService.dedupByURL(articles)
-    }
-
-    private var siblingCountsByURL: [String: Int] {
-        var counts: [String: Int] = [:]
-        for article in articles where !article.url.isEmpty {
-            counts[article.url, default: 0] += 1
-        }
-        return counts
-    }
-
-    private func additionalFeedCount(for article: Article) -> Int {
-        guard !article.url.isEmpty else { return 0 }
-        return max(0, (siblingCountsByURL[article.url] ?? 1) - 1)
-    }
-
-    private var featuredArticle: Article? {
-        dedupedArticles.first
-    }
-
-    private var groupedArticles: [(String, [Article])] {
-        let deduped = dedupedArticles
-        let rest = featuredArticle != nil ? Array(deduped.dropFirst()) : deduped
-        let cal = Calendar.current
-        let currentYear = cal.component(.year, from: Date())
-        let shortFormatter = DateFormatter()
-        shortFormatter.dateFormat = "MM/dd"
-        let fullFormatter = DateFormatter()
-        fullFormatter.dateFormat = "yyyy/MM/dd"
-        let groups = Dictionary(grouping: rest) { article -> String in
-            if cal.isDateInToday(article.publishedAt) { return "Today" }
-            if cal.isDateInYesterday(article.publishedAt) { return "Yesterday" }
-            let year = cal.component(.year, from: article.publishedAt)
-            return year == currentYear
-                ? shortFormatter.string(from: article.publishedAt)
-                : fullFormatter.string(from: article.publishedAt)
-        }
-        let order = ["Today", "Yesterday"]
-        return groups.sorted { a, b in
-            let ia = order.firstIndex(of: a.key) ?? Int.max
-            let ib = order.firstIndex(of: b.key) ?? Int.max
-            if ia != ib { return ia < ib }
-            let dateA = a.value.first?.publishedAt ?? .distantPast
-            let dateB = b.value.first?.publishedAt ?? .distantPast
-            return dateA > dateB
-        }
-    }
-
     var body: some View {
         NavigationStack {
             List {
-                if let featured = featuredArticle {
+                if !categories.isEmpty {
                     Section {
-                        articleCardRow(article: featured, featured: true)
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 8) {
+                                ForEach(categories) { category in
+                                    NavigationLink {
+                                        CategoryFilteredView(category: category)
+                                    } label: {
+                                        CategoryChip(category: category)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 4)
+                        }
+                        .listRowInsets(EdgeInsets())
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
                     }
                 }
 
-                ForEach(groupedArticles, id: \.0) { section, sectionArticles in
-                    Section(section) {
-                        ForEach(sectionArticles) { article in
-                            articleCardRow(article: article, featured: false)
-                        }
-                    }
-                }
+                ArticleFeedSections(
+                    articles: articles,
+                    selectedArticle: $selectedArticle
+                )
             }
             .navigationTitle("Latest")
             .toolbar {
@@ -115,24 +80,6 @@ struct LatestView: View {
         }
     }
 
-    @ViewBuilder
-    private func articleCardRow(article: Article, featured: Bool) -> some View {
-        Button {
-            selectedArticle = article
-        } label: {
-            ArticleRowView(
-                article: article,
-                featured: featured,
-                additionalFeedCount: additionalFeedCount(for: article)
-            )
-        }
-        .buttonStyle(.plain)
-        .contextMenu { ArticleContextMenu(article: article) }
-        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-        .listRowSeparator(.hidden)
-        .listRowBackground(Color.clear)
-    }
-
     private func refresh() async {
         isRefreshing = true
         await FeedService.shared.refreshAll(feeds: feeds, context: context)
@@ -142,5 +89,26 @@ struct LatestView: View {
     private func updateWidgetData() {
         guard !articles.isEmpty else { return }
         FeedService.shared.updateWidgetSnapshot(context: context)
+    }
+}
+
+private struct CategoryChip: View {
+    let category: Category
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Image(systemName: category.iconName)
+                .font(.caption)
+            Text(category.name)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+        }
+        .foregroundStyle(.primary)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(
+            Capsule()
+                .fill(Color(uiColor: .secondarySystemBackground))
+        )
     }
 }

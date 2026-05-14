@@ -11,7 +11,16 @@ struct CategoriesView: View {
     var body: some View {
         List {
             ForEach(categories) { category in
-                Text(category.name)
+                NavigationLink {
+                    CategoryEditView(category: category)
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: category.iconName)
+                            .frame(width: 24)
+                            .foregroundStyle(.primary)
+                        Text(category.name)
+                    }
+                }
             }
             .onDelete { indexSet in
                 for index in indexSet {
