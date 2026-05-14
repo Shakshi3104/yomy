@@ -5,13 +5,30 @@ struct CategoriesView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Category.sortOrder) private var categories: [Category]
 
-    @State private var newCategoryName = ""
-    @State private var showAddAlert = false
+    @State private var showsNewSheet = false
+    @State private var editingCategory: Category?
 
     var body: some View {
         List {
             ForEach(categories) { category in
-                Text(category.name)
+                Button {
+                    editingCategory = category
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: category.iconName)
+                            .frame(width: 24)
+                            .foregroundStyle(.primary)
+                        Text(category.name)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
             .onDelete { indexSet in
                 for index in indexSet {
@@ -34,37 +51,21 @@ struct CategoriesView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    showAddAlert = true
+                    showsNewSheet = true
                 } label: {
                     Image(systemName: "plus")
                 }
             }
         }
-        .alert("New Category", isPresented: $showAddAlert) {
-            TextField("Category name", text: $newCategoryName)
-                .textInputAutocapitalization(.words)
-            Button("Add") { addCategory() }
-                .disabled(trimmedName.isEmpty)
-            Button("Cancel", role: .cancel) {
-                newCategoryName = ""
+        .sheet(isPresented: $showsNewSheet) {
+            NavigationStack {
+                CategoryEditView()
             }
         }
-    }
-
-    private var trimmedName: String {
-        newCategoryName.trimmingCharacters(in: .whitespaces)
-    }
-
-    private func addCategory() {
-        let name = trimmedName
-        guard !name.isEmpty,
-              !categories.contains(where: { $0.name == name }) else {
-            newCategoryName = ""
-            return
+        .sheet(item: $editingCategory) { category in
+            NavigationStack {
+                CategoryEditView(category: category)
+            }
         }
-        let cat = Category(name: name, sortOrder: categories.count)
-        context.insert(cat)
-        try? context.save()
-        newCategoryName = ""
     }
 }
