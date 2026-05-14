@@ -53,48 +53,41 @@ struct IconPickerView: View {
     ]
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(Self.sections, id: \.title) { section in
-                        Section {
-                            ForEach(section.icons, id: \.self) { name in
-                                Button {
-                                    selection = name
-                                    dismiss()
-                                } label: {
-                                    Image(systemName: name)
-                                        .font(.title2)
-                                        .frame(width: 44, height: 44)
-                                        .foregroundStyle(selection == name ? Color.white : Color.primary)
-                                        .background(
-                                            Circle()
-                                                .fill(selection == name ? Color.accentColor : Color(uiColor: .secondarySystemBackground))
-                                        )
-                                }
-                                .buttonStyle(.plain)
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 12) {
+                ForEach(Self.sections, id: \.title) { section in
+                    Section {
+                        ForEach(section.icons, id: \.self) { name in
+                            Button {
+                                selection = name
+                                dismiss()
+                            } label: {
+                                Image(systemName: name)
+                                    .font(.title2)
+                                    .frame(width: 44, height: 44)
+                                    .foregroundStyle(selection == name ? Color.white : Color.primary)
+                                    .background(
+                                        Circle()
+                                            .fill(selection == name ? Color.accentColor : Color(uiColor: .secondarySystemBackground))
+                                    )
                             }
-                        } header: {
-                            HStack {
-                                Text(section.title)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(.secondary)
-                                Spacer(minLength: 0)
-                            }
-                            .padding(.top, 4)
-                            .padding(.bottom, 2)
+                            .buttonStyle(.plain)
                         }
+                    } header: {
+                        HStack {
+                            Text(section.title)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.top, 4)
+                        .padding(.bottom, 2)
                     }
                 }
-                .padding()
             }
-            .navigationTitle("Choose Icon")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
+            .padding()
         }
+        .navigationTitle("Choose Icon")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
