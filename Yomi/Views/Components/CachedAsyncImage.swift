@@ -28,7 +28,6 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
     let placeholder: () -> Placeholder
 
     @State private var uiImage: UIImage? = nil
-    @State private var task: Task<Void, Never>? = nil
 
     init(
         url: URL,
@@ -46,18 +45,14 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
                 content(Image(uiImage: uiImage))
             } else {
                 placeholder()
-                    .onAppear { load() }
-                    .onDisappear { task?.cancel() }
             }
         }
-    }
-
-    private func load() {
-        if let cached = ImageCache.shared.get(url) {
-            uiImage = cached
-            return
-        }
-        task = Task {
+        .task(id: url) {
+            if let cached = ImageCache.shared.get(url) {
+                uiImage = cached
+                return
+            }
+            uiImage = nil
             var request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
             request.setValue("image/*", forHTTPHeaderField: "Accept")
             guard let (data, response) = try? await URLSession.shared.data(for: request),
@@ -65,7 +60,7 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
                   let image = UIImage(data: data),
                   !Task.isCancelled else { return }
             ImageCache.shared.set(image, for: url)
-            await MainActor.run { uiImage = image }
+            uiImage = image
         }
     }
 }
