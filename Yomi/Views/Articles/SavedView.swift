@@ -11,10 +11,27 @@ struct SavedView: View {
     @Environment(\.modelContext) private var context
     @State private var selectedArticle: Article?
 
+    private var dedupedArticles: [Article] {
+        FeedService.dedupByURL(articles)
+    }
+
+    private var siblingCountsByURL: [String: Int] {
+        var counts: [String: Int] = [:]
+        for article in articles where !article.url.isEmpty {
+            counts[article.url, default: 0] += 1
+        }
+        return counts
+    }
+
+    private func additionalFeedCount(for article: Article) -> Int {
+        guard !article.url.isEmpty else { return 0 }
+        return max(0, (siblingCountsByURL[article.url] ?? 1) - 1)
+    }
+
     private var grouped: [(String, [Article])] {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM"
-        let groups = Dictionary(grouping: articles) { article in
+        let groups = Dictionary(grouping: dedupedArticles) { article in
             formatter.string(from: article.publishedAt)
         }
         return groups.sorted { $0.key > $1.key }
@@ -29,7 +46,10 @@ struct SavedView: View {
                             Button {
                                 selectedArticle = article
                             } label: {
-                                ArticleRowView(article: article)
+                                ArticleRowView(
+                                    article: article,
+                                    additionalFeedCount: additionalFeedCount(for: article)
+                                )
                             }
                             .buttonStyle(.plain)
                             .contextMenu { ArticleContextMenu(article: article) }
@@ -38,8 +58,7 @@ struct SavedView: View {
                             .listRowBackground(Color.clear)
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
-                                    article.isSaved = false
-                                    try? context.save()
+                                    FeedService.shared.setSaved(article: article, isSaved: false, context: context)
                                 } label: {
                                     Label("Unsave", systemImage: "bookmark.slash")
                                 }

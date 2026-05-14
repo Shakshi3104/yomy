@@ -4,6 +4,7 @@ struct ArticleRowView: View {
     let article: Article
     var showFeedName: Bool = true
     var featured: Bool = false
+    var additionalFeedCount: Int = 0
     @Environment(\.modelContext) private var context
 
     private var hasImage: Bool {
@@ -103,7 +104,7 @@ struct ArticleRowView: View {
     @ViewBuilder
     private var feedNameView: some View {
         if showFeedName, let feedTitle = article.feed?.title {
-            Text(feedTitle)
+            Text(additionalFeedCount > 0 ? "\(feedTitle) +\(additionalFeedCount)" : feedTitle)
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)

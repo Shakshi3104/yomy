@@ -94,8 +94,9 @@ final class FeedService {
             return
         }
         let unread = allArticles.filter { !$0.isRead }
-        let top = Array(unread.prefix(10))
-        widgetLog.info("updateWidgetSnapshot: total=\(allArticles.count) unread=\(unread.count) snapshot=\(top.count)")
+        let deduped = Self.dedupByURL(unread)
+        let top = Array(deduped.prefix(10))
+        widgetLog.info("updateWidgetSnapshot: total=\(allArticles.count) unread=\(unread.count) deduped=\(deduped.count) snapshot=\(top.count)")
         let widgetArticles = top.map { article in
             WidgetArticle(
                 id: article.id.uuidString,
@@ -208,5 +209,49 @@ final class FeedService {
         }
         try context.save()
         updateWidgetSnapshot(context: context)
+    }
+
+    static func dedupByURL(_ articles: [Article]) -> [Article] {
+        var seen = Set<String>()
+        var result: [Article] = []
+        result.reserveCapacity(articles.count)
+        for article in articles {
+            if article.url.isEmpty {
+                result.append(article)
+                continue
+            }
+            if seen.insert(article.url).inserted {
+                result.append(article)
+            }
+        }
+        return result
+    }
+
+    func setRead(article: Article, isRead: Bool, context: ModelContext) {
+        applyToSiblings(of: article, context: context) { $0.isRead = isRead }
+        try? context.save()
+        updateWidgetSnapshot(context: context)
+    }
+
+    func setSaved(article: Article, isSaved: Bool, context: ModelContext) {
+        applyToSiblings(of: article, context: context) { $0.isSaved = isSaved }
+        try? context.save()
+    }
+
+    private func applyToSiblings(
+        of article: Article,
+        context: ModelContext,
+        _ body: (Article) -> Void
+    ) {
+        let url = article.url
+        guard !url.isEmpty else {
+            body(article)
+            return
+        }
+        let descriptor = FetchDescriptor<Article>(predicate: #Predicate { $0.url == url })
+        let siblings = (try? context.fetch(descriptor)) ?? [article]
+        for sibling in siblings {
+            body(sibling)
+        }
     }
 }

@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import WidgetKit
 
 struct LatestView: View {
     @Environment(\.modelContext) private var context
@@ -11,12 +10,30 @@ struct LatestView: View {
     @State private var selectedArticle: Article?
     @State private var showSettings = false
 
+    private var dedupedArticles: [Article] {
+        FeedService.dedupByURL(articles)
+    }
+
+    private var siblingCountsByURL: [String: Int] {
+        var counts: [String: Int] = [:]
+        for article in articles where !article.url.isEmpty {
+            counts[article.url, default: 0] += 1
+        }
+        return counts
+    }
+
+    private func additionalFeedCount(for article: Article) -> Int {
+        guard !article.url.isEmpty else { return 0 }
+        return max(0, (siblingCountsByURL[article.url] ?? 1) - 1)
+    }
+
     private var featuredArticle: Article? {
-        articles.first
+        dedupedArticles.first
     }
 
     private var groupedArticles: [(String, [Article])] {
-        let rest = featuredArticle != nil ? Array(articles.dropFirst()) : articles
+        let deduped = dedupedArticles
+        let rest = featuredArticle != nil ? Array(deduped.dropFirst()) : deduped
         let cal = Calendar.current
         let currentYear = cal.component(.year, from: Date())
         let shortFormatter = DateFormatter()
@@ -103,7 +120,11 @@ struct LatestView: View {
         Button {
             selectedArticle = article
         } label: {
-            ArticleRowView(article: article, featured: featured)
+            ArticleRowView(
+                article: article,
+                featured: featured,
+                additionalFeedCount: additionalFeedCount(for: article)
+            )
         }
         .buttonStyle(.plain)
         .contextMenu { ArticleContextMenu(article: article) }
@@ -120,39 +141,6 @@ struct LatestView: View {
 
     private func updateWidgetData() {
         guard !articles.isEmpty else { return }
-        let top = Array(articles.prefix(10))
-        let widgetArticles = top.map { article in
-            WidgetArticle(
-                id: article.id.uuidString,
-                title: article.title,
-                feedTitle: article.feed?.title ?? "",
-                url: article.url,
-                imageURL: article.imageURL,
-                publishedAt: article.publishedAt
-            )
-        }
-        WidgetDataStore.save(widgetArticles)
-
-        let keepIDs = Set(widgetArticles.map(\.id))
-        WidgetDataStore.cleanUpImages(keeping: keepIDs)
-
-        Task.detached {
-            await cacheWidgetImages(top)
-            WidgetCenter.shared.reloadAllTimelines()
-        }
-    }
-
-    private nonisolated func cacheWidgetImages(_ articles: [Article]) async {
-        await withTaskGroup(of: Void.self) { group in
-            for article in articles {
-                guard let urlString = article.imageURL,
-                      let url = URL(string: urlString) else { continue }
-                if WidgetDataStore.loadImage(for: article.id.uuidString) != nil { continue }
-                group.addTask {
-                    guard let (data, _) = try? await URLSession.shared.data(from: url) else { return }
-                    WidgetDataStore.cacheImage(data: data, for: article.id.uuidString)
-                }
-            }
-        }
+        FeedService.shared.updateWidgetSnapshot(context: context)
     }
 }
