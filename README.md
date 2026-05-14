@@ -1,5 +1,7 @@
 # yomy 📰
 
+![yomy screenshots](materials/yomy.png)
+
 yomy is a simple RSS reader for iOS, inspired by Apple News.
 
 The name comes from 読み (*yomi*), Japanese for "reading".
