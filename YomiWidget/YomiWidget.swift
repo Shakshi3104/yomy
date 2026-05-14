@@ -57,31 +57,44 @@ struct YomiSmallView: View {
 
     var body: some View {
         if let article = entry.articles.first {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 4) {
-                    Image(systemName: "newspaper.fill")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    Text(article.feedTitle)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
+            VStack(alignment: .leading, spacing: 2) {
+                Text(article.feedTitle)
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.85))
+                    .lineLimit(1)
 
                 Text(article.title)
                     .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .lineLimit(4)
-
-                Text(article.publishedAt, style: .relative)
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+                    .lineLimit(3)
             }
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
             .widgetURL(articleURL(article.url))
+            .containerBackground(for: .widget) {
+                ZStack {
+                    if let uiImage = WidgetDataStore.loadImage(for: article.id) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        LinearGradient(
+                            colors: [Color(.systemGray3), Color(.systemGray5)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    }
+                    LinearGradient(
+                        stops: [
+                            .init(color: .clear, location: 0.35),
+                            .init(color: .black.opacity(0.55), location: 0.6),
+                            .init(color: .black.opacity(0.9), location: 1.0)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                }
+            }
         } else {
             VStack(spacing: 8) {
                 Image(systemName: "newspaper")
@@ -92,6 +105,7 @@ struct YomiSmallView: View {
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .containerBackground(.fill.tertiary, for: .widget)
         }
     }
 }
@@ -100,53 +114,56 @@ struct YomiMediumView: View {
     let entry: ArticleEntry
 
     var body: some View {
-        if entry.articles.isEmpty {
-            VStack(spacing: 8) {
-                Image(systemName: "newspaper")
-                    .font(.title2)
-                    .foregroundStyle(.tertiary)
-                Text("No articles")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
-            VStack(alignment: .leading, spacing: 0) {
-                ForEach(entry.articles.prefix(3)) { article in
-                    Link(destination: articleURL(article.url)) {
-                        HStack(alignment: .center, spacing: 10) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(article.feedTitle)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                                Text(article.title)
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .lineLimit(2)
-                                    .foregroundStyle(.primary)
-                            }
-                            Spacer(minLength: 4)
-                            if let uiImage = WidgetDataStore.loadImage(for: article.id) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 48, height: 36)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                            }
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                    }
-
-                    if article.id != entry.articles.prefix(3).last?.id {
-                        Divider()
-                            .padding(.horizontal, 14)
-                    }
+        Group {
+            if entry.articles.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "newspaper")
+                        .font(.title2)
+                        .foregroundStyle(.tertiary)
+                    Text("No articles")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(entry.articles.prefix(3)) { article in
+                        Link(destination: articleURL(article.url)) {
+                            HStack(alignment: .center, spacing: 10) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(article.feedTitle)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                    Text(article.title)
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .lineLimit(2)
+                                        .foregroundStyle(.primary)
+                                }
+                                Spacer(minLength: 4)
+                                if let uiImage = WidgetDataStore.loadImage(for: article.id) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 48, height: 36)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                }
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                        }
+
+                        if article.id != entry.articles.prefix(3).last?.id {
+                            Divider()
+                                .padding(.horizontal, 14)
+                        }
+                    }
+                    Spacer(minLength: 0)
+                }
             }
         }
+        .containerBackground(.fill.tertiary, for: .widget)
     }
 }
 
@@ -154,53 +171,56 @@ struct YomiLargeView: View {
     let entry: ArticleEntry
 
     var body: some View {
-        if entry.articles.isEmpty {
-            VStack(spacing: 8) {
-                Image(systemName: "newspaper")
-                    .font(.title2)
-                    .foregroundStyle(.tertiary)
-                Text("No articles")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
-            VStack(alignment: .leading, spacing: 0) {
-                ForEach(entry.articles.prefix(6)) { article in
-                    Link(destination: articleURL(article.url)) {
-                        HStack(alignment: .center, spacing: 10) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(article.feedTitle)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                                Text(article.title)
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .lineLimit(2)
-                                    .foregroundStyle(.primary)
-                            }
-                            Spacer(minLength: 4)
-                            if let uiImage = WidgetDataStore.loadImage(for: article.id) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 56, height: 42)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                            }
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 9)
-                    }
-
-                    if article.id != entry.articles.prefix(6).last?.id {
-                        Divider()
-                            .padding(.horizontal, 14)
-                    }
+        Group {
+            if entry.articles.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "newspaper")
+                        .font(.title2)
+                        .foregroundStyle(.tertiary)
+                    Text("No articles")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(entry.articles.prefix(6)) { article in
+                        Link(destination: articleURL(article.url)) {
+                            HStack(alignment: .center, spacing: 10) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(article.feedTitle)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                    Text(article.title)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .lineLimit(2)
+                                        .foregroundStyle(.primary)
+                                }
+                                Spacer(minLength: 4)
+                                if let uiImage = WidgetDataStore.loadImage(for: article.id) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 56, height: 42)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                }
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 9)
+                        }
+
+                        if article.id != entry.articles.prefix(6).last?.id {
+                            Divider()
+                                .padding(.horizontal, 14)
+                        }
+                    }
+                    Spacer(minLength: 0)
+                }
             }
         }
+        .containerBackground(.fill.tertiary, for: .widget)
     }
 }
 
@@ -230,7 +250,6 @@ struct YomiWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             YomiWidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("yomy")
         .description("Check the latest articles on your home screen")
