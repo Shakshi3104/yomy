@@ -41,6 +41,9 @@ struct LatestView: View {
                     selectedArticle: $selectedArticle
                 )
             }
+            .refreshable {
+                await refresh()
+            }
             .navigationTitle("Latest")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -58,9 +61,6 @@ struct LatestView: View {
                 NavigationStack {
                     ArticleWebView(article: article)
                 }
-            }
-            .refreshable {
-                await refresh()
             }
             .onAppear {
                 updateWidgetData()

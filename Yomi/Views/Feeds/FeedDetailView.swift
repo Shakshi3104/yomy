@@ -28,6 +28,9 @@ struct FeedDetailView: View {
             .listRowSeparator(.hidden)
             .listRowBackground(Color.clear)
         }
+        .refreshable {
+            try? await FeedService.shared.refresh(feed: feed, context: context)
+        }
         .navigationTitle(feed.title.isEmpty ? feed.url : feed.title)
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedArticle) { article in
@@ -75,9 +78,6 @@ struct FeedDetailView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("\"\(feed.title.isEmpty ? feed.url : feed.title)\" and all its articles will be removed.")
-        }
-        .refreshable {
-            try? await FeedService.shared.refresh(feed: feed, context: context)
         }
         .overlay {
             if sortedArticles.isEmpty {
