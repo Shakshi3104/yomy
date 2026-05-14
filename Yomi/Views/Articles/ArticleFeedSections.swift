@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ArticleFeedSections: View {
     let articles: [Article]
+    var showsFeatured: Bool = true
     @Binding var selectedArticle: Article?
 
     private var dedupedArticles: [Article] {
@@ -22,7 +23,7 @@ struct ArticleFeedSections: View {
     }
 
     private var featuredArticle: Article? {
-        dedupedArticles.first
+        showsFeatured ? dedupedArticles.first : nil
     }
 
     private var groupedArticles: [(String, [Article])] {

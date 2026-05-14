@@ -20,6 +20,7 @@ struct CategoryFilteredView: View {
         List {
             ArticleFeedSections(
                 articles: filteredArticles,
+                showsFeatured: false,
                 selectedArticle: $selectedArticle
             )
         }
