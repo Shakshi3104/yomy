@@ -10,7 +10,6 @@ struct CategoryEditView: View {
 
     @State private var name: String
     @State private var iconName: String
-    @State private var showIconPicker = false
     @FocusState private var nameFocused: Bool
 
     init(category: Category? = nil) {
@@ -49,8 +48,8 @@ struct CategoryEditView: View {
                         .fill(Color(uiColor: .secondarySystemGroupedBackground))
                 )
 
-                Button {
-                    showIconPicker = true
+                NavigationLink {
+                    IconPickerView(selection: $iconName)
                 } label: {
                     HStack {
                         Text("Edit Icon...")
@@ -75,9 +74,6 @@ struct CategoryEditView: View {
         .navigationTitle(isEditing ? "Edit Category" : "New Category")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") { dismiss() }
-            }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") {
                     save()
@@ -85,9 +81,6 @@ struct CategoryEditView: View {
                 }
                 .disabled(trimmedName.isEmpty)
             }
-        }
-        .sheet(isPresented: $showIconPicker) {
-            IconPickerView(selection: $iconName)
         }
         .onAppear {
             if !isEditing {

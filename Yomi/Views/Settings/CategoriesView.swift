@@ -5,14 +5,11 @@ struct CategoriesView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \Category.sortOrder) private var categories: [Category]
 
-    @State private var showsNewSheet = false
-    @State private var editingCategory: Category?
-
     var body: some View {
         List {
             ForEach(categories) { category in
-                Button {
-                    editingCategory = category
+                NavigationLink {
+                    CategoryEditView(category: category)
                 } label: {
                     HStack(spacing: 12) {
                         Image(systemName: category.iconName)
@@ -20,15 +17,8 @@ struct CategoriesView: View {
                             .foregroundStyle(.primary)
                         Text(category.name)
                             .foregroundStyle(.primary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.tertiary)
                     }
-                    .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
             }
             .onDelete { indexSet in
                 for index in indexSet {
@@ -50,21 +40,11 @@ struct CategoriesView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showsNewSheet = true
+                NavigationLink {
+                    CategoryEditView()
                 } label: {
                     Image(systemName: "plus")
                 }
-            }
-        }
-        .sheet(isPresented: $showsNewSheet) {
-            NavigationStack {
-                CategoryEditView()
-            }
-        }
-        .sheet(item: $editingCategory) { category in
-            NavigationStack {
-                CategoryEditView(category: category)
             }
         }
     }
