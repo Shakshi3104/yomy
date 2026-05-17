@@ -30,8 +30,8 @@
           }
         },
         {
-          "name": "publish",
-          "run": "asc publish testflight --app \"$APP_ID\" --ipa ${steps.export.IPA_PATH} --wait --output json"
+          "name": "upload",
+          "run": "asc builds upload --app \"$APP_ID\" --ipa ${steps.export.IPA_PATH} --wait --output json"
         }
       ]
     }
