@@ -234,7 +234,11 @@ final class FeedService {
     }
 
     func setSaved(article: Article, isSaved: Bool, context: ModelContext) {
-        applyToSiblings(of: article, context: context) { $0.isSaved = isSaved }
+        let now = Date()
+        applyToSiblings(of: article, context: context) {
+            $0.isSaved = isSaved
+            $0.savedAt = isSaved ? now : nil
+        }
         try? context.save()
     }
 

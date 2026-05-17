@@ -4,12 +4,16 @@ import SwiftData
 struct SavedView: View {
     @Query(
         filter: #Predicate<Article> { $0.isSaved },
-        sort: \Article.publishedAt,
+        sort: \Article.savedAt,
         order: .reverse
     ) private var articles: [Article]
 
     @Environment(\.modelContext) private var context
     @State private var selectedArticle: Article?
+
+    private func savedDate(for article: Article) -> Date {
+        article.savedAt ?? article.createdAt
+    }
 
     private var dedupedArticles: [Article] {
         FeedService.dedupByURL(articles)
@@ -32,9 +36,16 @@ struct SavedView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy/MM"
         let groups = Dictionary(grouping: dedupedArticles) { article in
-            formatter.string(from: article.publishedAt)
+            formatter.string(from: savedDate(for: article))
         }
-        return groups.sorted { $0.key > $1.key }
+        return groups
+            .map { (key: $0.key, articles: $0.value) }
+            .sorted { lhs, rhs in
+                let lhsDate = lhs.articles.first.map(savedDate(for:)) ?? .distantPast
+                let rhsDate = rhs.articles.first.map(savedDate(for:)) ?? .distantPast
+                return lhsDate > rhsDate
+            }
+            .map { ($0.key, $0.articles) }
     }
 
     var body: some View {

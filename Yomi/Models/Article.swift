@@ -13,6 +13,7 @@ final class Article {
     var publishedAt: Date
     var isRead: Bool
     var isSaved: Bool
+    var savedAt: Date?
     var createdAt: Date
 
     var feed: Feed?
@@ -37,6 +38,7 @@ final class Article {
         self.publishedAt = publishedAt
         self.isRead = false
         self.isSaved = false
+        self.savedAt = nil
         self.createdAt = Date()
         self.feed = feed
     }
