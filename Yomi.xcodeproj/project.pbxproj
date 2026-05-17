@@ -309,6 +309,7 @@
 				C377D8EE04CC7BBCEA868643 /* Resources */,
 				E0BD51C833999011F6D09A8D /* Frameworks */,
 				B537DE03CDE57A65E3BE7C2E /* Embed Foundation Extensions */,
+				D1C0DF1ED1C0DF1ED1C0DF30 /* Set Build Number */,
 			);
 			buildRules = (
 			);
@@ -385,6 +386,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D1C0DF1ED1C0DF1ED1C0DF30 /* Set Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Set Build Number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"$SRCROOT\"\nBUILD_NUMBER=$(git rev-list --count HEAD 2>/dev/null || echo \"1\")\nAPP_PLIST=\"$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH\"\nif [ -f \"$APP_PLIST\" ]; then\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_NUMBER\" \"$APP_PLIST\"\n    echo \"Set CFBundleVersion to $BUILD_NUMBER in $APP_PLIST\"\nfi\nPLUGINS_DIR=\"$(dirname \"$APP_PLIST\")/PlugIns\"\nif [ -d \"$PLUGINS_DIR\" ]; then\n    for appex in \"$PLUGINS_DIR\"/*.appex; do\n        appex_plist=\"$appex/Info.plist\"\n        if [ -f \"$appex_plist\" ]; then\n            /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_NUMBER\" \"$appex_plist\"\n            echo \"Set CFBundleVersion to $BUILD_NUMBER in $appex_plist\"\n        fi\n    done\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0ED16F5A9D44DDB3C08CFE67 /* Sources */ = {
@@ -530,7 +553,7 @@
 				DEVELOPMENT_TEAM = WHBF4Z49B6;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -620,7 +643,7 @@
 				DEVELOPMENT_TEAM = WHBF4Z49B6;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
