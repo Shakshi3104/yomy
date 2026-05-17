@@ -12,6 +12,7 @@ struct YomiApp: App {
             fatalError("Failed to create ModelContainer: \(error)")
         }
         seedDefaultCategoryIfNeeded()
+        backfillSavedAtIfNeeded()
         BackgroundRefreshService.register()
         BackgroundRefreshService.schedule()
     }
@@ -22,6 +23,22 @@ struct YomiApp: App {
         let context = ModelContext(container)
         context.insert(Category(name: "General", sortOrder: 0))
         try? context.save()
+        UserDefaults.standard.set(true, forKey: key)
+    }
+
+    private func backfillSavedAtIfNeeded() {
+        let key = "yomy.didBackfillSavedAt"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        let context = ModelContext(container)
+        let descriptor = FetchDescriptor<Article>(
+            predicate: #Predicate { $0.isSaved && $0.savedAt == nil }
+        )
+        if let articles = try? context.fetch(descriptor) {
+            for article in articles {
+                article.savedAt = article.createdAt
+            }
+            try? context.save()
+        }
         UserDefaults.standard.set(true, forKey: key)
     }
 
