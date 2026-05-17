@@ -20,6 +20,11 @@ The name comes from 読み (*yomi*), Japanese for "reading".
 - Xcode 16.0+
 - iOS 17.0+ (some features require iOS 26)
 
+## Links
+
+- [Website](https://shakshi3104.github.io/yomy/)
+- [Privacy Policy](https://shakshi3104.github.io/yomy/privacy.html)
+
 ## Acknowledgements
 
 Originally forked from [minsc-of-secrets/yomy](https://github.com/minsc-of-secrets/yomy).
