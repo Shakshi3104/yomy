@@ -1,9 +1,8 @@
 import SwiftUI
 
 struct AboutView: View {
-    // TODO: set URLs when ready
-    private static let websiteURL: URL? = nil
-    private static let privacyURL: URL? = nil
+    private static let websiteURL = URL(string: "https://shakshi3104.github.io/yomy/")
+    private static let privacyURL = URL(string: "https://shakshi3104.github.io/yomy/privacy.html")
 
     private var versionText: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
