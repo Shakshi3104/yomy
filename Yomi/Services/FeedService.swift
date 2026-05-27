@@ -21,7 +21,12 @@ final class FeedService {
         }
         feed.fetchedAt = Date()
 
-        let existingByGUID = Dictionary(uniqueKeysWithValues: feed.articles.map { ($0.guid, $0) })
+        // 過去に重複 guid が混入していてもクラッシュさせないため uniquingKeysWith: を使う
+        let existingByGUID = Dictionary(
+            feed.articles.map { ($0.guid, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var insertedGUIDs = Set<String>()
         var needsOGFetch: [(Article, String)] = []
 
         for parsedArticle in parsed.articles {
@@ -32,6 +37,8 @@ final class FeedService {
                 }
                 continue
             }
+            // 同一フェッチ内で重複 guid が来た場合は最初の 1 件だけを挿入する
+            guard insertedGUIDs.insert(parsedArticle.guid).inserted else { continue }
             let article = Article(
                 guid: parsedArticle.guid,
                 url: parsedArticle.url,
