@@ -4,8 +4,10 @@ import SwiftData
 
 final class BackgroundRefreshService {
     static let taskIdentifier = "com.shakshi.yomy.refresh"
+    private static var sharedContainer: ModelContainer?
 
-    static func register() {
+    static func register(container: ModelContainer) {
+        sharedContainer = container
         BGTaskScheduler.shared.register(forTaskWithIdentifier: taskIdentifier, using: nil) { task in
             handleAppRefresh(task: task as! BGAppRefreshTask)
         }
@@ -24,17 +26,20 @@ final class BackgroundRefreshService {
     private static func handleAppRefresh(task: BGAppRefreshTask) {
         schedule()
 
+        // メインアプリと同じ ModelContainer を共有する。
+        // 別 Container を新規作成すると、同じ SQLite を別キャッシュで開くことになり、
+        // メイン側との同時 refresh で同一 guid の Article が二重 insert されて、
+        // 次回 refresh の Dictionary(uniqueKeysWithValues:) がトラップする原因になる。
+        guard let container = sharedContainer else {
+            task.setTaskCompleted(success: false)
+            return
+        }
+
         let work = Task {
-            do {
-                let container = try ModelContainer(for: Feed.self, Article.self, Category.self)
-                let context = ModelContext(container)
-                let feeds = try context.fetch(FetchDescriptor<Feed>())
-                await FeedService.shared.refreshAll(feeds: feeds, context: context)
-                task.setTaskCompleted(success: !Task.isCancelled)
-            } catch {
-                print("[BackgroundRefresh] refresh failed: \(error)")
-                task.setTaskCompleted(success: false)
-            }
+            let context = ModelContext(container)
+            let feeds = (try? context.fetch(FetchDescriptor<Feed>())) ?? []
+            await FeedService.shared.refreshAll(feeds: feeds, context: context)
+            task.setTaskCompleted(success: !Task.isCancelled)
         }
 
         task.expirationHandler = {
