@@ -13,7 +13,7 @@ struct YomiApp: App {
         }
         seedDefaultCategoryIfNeeded()
         backfillSavedAtIfNeeded()
-        BackgroundRefreshService.register()
+        BackgroundRefreshService.register(container: container)
         BackgroundRefreshService.schedule()
     }
 

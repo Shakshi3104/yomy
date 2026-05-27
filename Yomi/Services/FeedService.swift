@@ -21,7 +21,19 @@ final class FeedService {
         }
         feed.fetchedAt = Date()
 
-        let existingByGUID = Dictionary(uniqueKeysWithValues: feed.articles.map { ($0.guid, $0) })
+        // feed.articles リレーションのキャッシュではなく FetchDescriptor で store を読む。
+        // 別 context（旧 BG refresh など）が直前に書いた行も拾えるようにするための保険。
+        let feedID = feed.id
+        let descriptor = FetchDescriptor<Article>(
+            predicate: #Predicate<Article> { $0.feed?.id == feedID }
+        )
+        let storedArticles = (try? context.fetch(descriptor)) ?? feed.articles
+        // 過去に重複 guid が混入していてもクラッシュさせないため uniquingKeysWith: を使う
+        let existingByGUID = Dictionary(
+            storedArticles.map { ($0.guid, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        var insertedGUIDs = Set<String>()
         var needsOGFetch: [(Article, String)] = []
 
         for parsedArticle in parsed.articles {
@@ -32,6 +44,8 @@ final class FeedService {
                 }
                 continue
             }
+            // 同一フェッチ内で重複 guid が来た場合は最初の 1 件だけを挿入する
+            guard insertedGUIDs.insert(parsedArticle.guid).inserted else { continue }
             let article = Article(
                 guid: parsedArticle.guid,
                 url: parsedArticle.url,
