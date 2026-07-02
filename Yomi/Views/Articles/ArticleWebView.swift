@@ -13,7 +13,7 @@ struct ArticleWebView: View {
             url: URL(string: article.url),
             navigator: navigator
         )
-        .navigationTitle(article.feed?.title ?? "")
+        .navigationTitle(article.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -30,14 +30,9 @@ struct ArticleWebView: View {
                     Image(systemName: article.isSaved ? "bookmark.fill" : "bookmark")
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                if let url = URL(string: article.url) {
-                    ShareLink(item: url) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                }
-            }
             ToolbarItemGroup(placement: .bottomBar) {
+                // Safari-style bottom bar: back / forward grouped on the leading
+                // side, share + reload on the trailing side.
                 Button {
                     navigator.goBack()
                 } label: {
@@ -45,14 +40,28 @@ struct ArticleWebView: View {
                 }
                 .disabled(!navigator.canGoBack)
 
-                Spacer()
-
                 Button {
                     navigator.goForward()
                 } label: {
                     Image(systemName: "chevron.forward")
                 }
                 .disabled(!navigator.canGoForward)
+
+                Spacer()
+
+                // Share the page currently on screen, not always the original
+                // article — the user may have followed links inside the WebView.
+                if let url = navigator.currentURL ?? URL(string: article.url) {
+                    ShareLink(item: url) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+
+                Button {
+                    navigator.reload()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
             }
         }
         .onAppear {
@@ -72,9 +81,12 @@ final class WebViewNavigator {
     @ObservationIgnored fileprivate weak var webView: WKWebView?
     var canGoBack = false
     var canGoForward = false
+    /// URL of the page currently displayed (tracks in-page link navigation).
+    var currentURL: URL?
 
     func goBack() { webView?.goBack() }
     func goForward() { webView?.goForward() }
+    func reload() { webView?.reload() }
 }
 
 struct WebViewRepresentable: UIViewRepresentable {
@@ -109,6 +121,7 @@ struct WebViewRepresentable: UIViewRepresentable {
         private let navigator: WebViewNavigator
         private var backObservation: NSKeyValueObservation?
         private var forwardObservation: NSKeyValueObservation?
+        private var urlObservation: NSKeyValueObservation?
 
         init(navigator: WebViewNavigator) {
             self.navigator = navigator
@@ -125,13 +138,18 @@ struct WebViewRepresentable: UIViewRepresentable {
             forwardObservation = webView.observe(\.canGoForward, options: [.new]) { [navigator] webView, _ in
                 navigator.canGoForward = webView.canGoForward
             }
+            urlObservation = webView.observe(\.url, options: [.new]) { [navigator] webView, _ in
+                navigator.currentURL = webView.url
+            }
         }
 
         func stopObserving() {
             backObservation?.invalidate()
             forwardObservation?.invalidate()
+            urlObservation?.invalidate()
             backObservation = nil
             forwardObservation = nil
+            urlObservation = nil
         }
     }
 }
