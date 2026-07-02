@@ -31,7 +31,9 @@ struct ArticleWebView: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                if let url = URL(string: article.url) {
+                // Share the page currently on screen, not always the original
+                // article — the user may have followed links inside the WebView.
+                if let url = navigator.currentURL ?? URL(string: article.url) {
                     ShareLink(item: url) {
                         Image(systemName: "square.and.arrow.up")
                     }
@@ -72,6 +74,8 @@ final class WebViewNavigator {
     @ObservationIgnored fileprivate weak var webView: WKWebView?
     var canGoBack = false
     var canGoForward = false
+    /// URL of the page currently displayed (tracks in-page link navigation).
+    var currentURL: URL?
 
     func goBack() { webView?.goBack() }
     func goForward() { webView?.goForward() }
@@ -109,6 +113,7 @@ struct WebViewRepresentable: UIViewRepresentable {
         private let navigator: WebViewNavigator
         private var backObservation: NSKeyValueObservation?
         private var forwardObservation: NSKeyValueObservation?
+        private var urlObservation: NSKeyValueObservation?
 
         init(navigator: WebViewNavigator) {
             self.navigator = navigator
@@ -125,13 +130,18 @@ struct WebViewRepresentable: UIViewRepresentable {
             forwardObservation = webView.observe(\.canGoForward, options: [.new]) { [navigator] webView, _ in
                 navigator.canGoForward = webView.canGoForward
             }
+            urlObservation = webView.observe(\.url, options: [.new]) { [navigator] webView, _ in
+                navigator.currentURL = webView.url
+            }
         }
 
         func stopObserving() {
             backObservation?.invalidate()
             forwardObservation?.invalidate()
+            urlObservation?.invalidate()
             backObservation = nil
             forwardObservation = nil
+            urlObservation = nil
         }
     }
 }
