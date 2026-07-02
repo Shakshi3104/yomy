@@ -330,6 +330,7 @@
 			buildPhases = (
 				0ED16F5A9D44DDB3C08CFE67 /* Sources */,
 				CEA57D37C6F283D7269EFEE9 /* Frameworks */,
+				D1C0DF1ED1C0DF1ED1C0DF40 /* Set Build Number */,
 			);
 			buildRules = (
 			);
@@ -405,7 +406,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT\"\nBUILD_NUMBER=$(git rev-list --count HEAD 2>/dev/null || echo \"1\")\nAPP_PLIST=\"$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH\"\nif [ -f \"$APP_PLIST\" ]; then\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_NUMBER\" \"$APP_PLIST\"\n    echo \"Set CFBundleVersion to $BUILD_NUMBER in $APP_PLIST\"\nfi\nPLUGINS_DIR=\"$(dirname \"$APP_PLIST\")/PlugIns\"\nif [ -d \"$PLUGINS_DIR\" ]; then\n    for appex in \"$PLUGINS_DIR\"/*.appex; do\n        appex_plist=\"$appex/Info.plist\"\n        if [ -f \"$appex_plist\" ]; then\n            /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_NUMBER\" \"$appex_plist\"\n            echo \"Set CFBundleVersion to $BUILD_NUMBER in $appex_plist\"\n        fi\n    done\nfi\n";
+			shellScript = "cd \"$SRCROOT\"\nBUILD_NUMBER=$(git rev-list --count HEAD 2>/dev/null || echo \"1\")\nAPP_PLIST=\"$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH\"\nif [ -f \"$APP_PLIST\" ]; then\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_NUMBER\" \"$APP_PLIST\"\n    echo \"Set CFBundleVersion to $BUILD_NUMBER in $APP_PLIST\"\nfi\n# NOTE: Do NOT modify embedded .appex Info.plist here. This phase runs after the\n# widget is signed, so editing its Info.plist breaks the appex code signature\n# (invalid Info.plist / 0xe8008001 on device install). The widget sets its own\n# CFBundleVersion via its own build phase, before it is signed.\n";
+		};
+		D1C0DF1ED1C0DF1ED1C0DF40 /* Set Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Set Build Number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"$SRCROOT\"\nBUILD_NUMBER=$(git rev-list --count HEAD 2>/dev/null || echo \"1\")\nWIDGET_PLIST=\"$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH\"\nif [ -f \"$WIDGET_PLIST\" ]; then\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $BUILD_NUMBER\" \"$WIDGET_PLIST\"\n    echo \"Set CFBundleVersion to $BUILD_NUMBER in $WIDGET_PLIST\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
