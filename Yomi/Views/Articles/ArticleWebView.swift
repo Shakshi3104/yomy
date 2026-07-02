@@ -13,7 +13,7 @@ struct ArticleWebView: View {
             url: URL(string: article.url),
             navigator: navigator
         )
-        .navigationTitle(article.feed?.title ?? "")
+        .navigationTitle(article.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
