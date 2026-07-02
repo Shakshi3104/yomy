@@ -91,10 +91,12 @@ struct WebViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        guard let url else { return }
-        if webView.url != url {
-            webView.load(URLRequest(url: url))
-        }
+        // Load only once, on first appearance. Comparing against `url` would
+        // reload the original article whenever the user follows an in-page link
+        // (canGoBack/canGoForward state changes retrigger updateUIView), which
+        // would defeat the back/forward navigation this view provides.
+        guard let url, webView.url == nil else { return }
+        webView.load(URLRequest(url: url))
     }
 
     static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
@@ -113,10 +115,14 @@ struct WebViewRepresentable: UIViewRepresentable {
         }
 
         func observe(_ webView: WKWebView) {
-            backObservation = webView.observe(\.canGoBack, options: [.initial, .new]) { [weak self] webView, _ in
+            // No `.initial`: it fires synchronously during makeUIView (inside the
+            // SwiftUI update phase) and writing the binding there triggers a
+            // "Modifying state during view update" warning. The @State defaults
+            // to false, which already matches a fresh web view's history.
+            backObservation = webView.observe(\.canGoBack, options: [.new]) { [weak self] webView, _ in
                 self?.canGoBack = webView.canGoBack
             }
-            forwardObservation = webView.observe(\.canGoForward, options: [.initial, .new]) { [weak self] webView, _ in
+            forwardObservation = webView.observe(\.canGoForward, options: [.new]) { [weak self] webView, _ in
                 self?.canGoForward = webView.canGoForward
             }
         }
