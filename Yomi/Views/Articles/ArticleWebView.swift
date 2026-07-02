@@ -7,15 +7,11 @@ struct ArticleWebView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var navigator = WebViewNavigator()
-    @State private var canGoBack = false
-    @State private var canGoForward = false
 
     var body: some View {
         WebViewRepresentable(
             url: URL(string: article.url),
-            navigator: navigator,
-            canGoBack: $canGoBack,
-            canGoForward: $canGoForward
+            navigator: navigator
         )
         .navigationTitle(article.feed?.title ?? "")
         .navigationBarTitleDisplayMode(.inline)
@@ -47,7 +43,7 @@ struct ArticleWebView: View {
                 } label: {
                     Image(systemName: "chevron.backward")
                 }
-                .disabled(!canGoBack)
+                .disabled(!navigator.canGoBack)
 
                 Spacer()
 
@@ -56,7 +52,7 @@ struct ArticleWebView: View {
                 } label: {
                     Image(systemName: "chevron.forward")
                 }
-                .disabled(!canGoForward)
+                .disabled(!navigator.canGoForward)
             }
         }
         .onAppear {
@@ -67,11 +63,15 @@ struct ArticleWebView: View {
     }
 }
 
-/// Holds a reference to the live `WKWebView` so the toolbar can drive its
-/// navigation history (`goBack` / `goForward`).
+/// Single source of truth for the WebView's navigation state. Holds a reference
+/// to the live `WKWebView` so the toolbar can drive its history (`goBack` /
+/// `goForward`), and exposes `canGoBack` / `canGoForward` as observable state so
+/// the toolbar buttons enable/disable in step with the web view.
 @Observable
 final class WebViewNavigator {
-    fileprivate weak var webView: WKWebView?
+    @ObservationIgnored fileprivate weak var webView: WKWebView?
+    var canGoBack = false
+    var canGoForward = false
 
     func goBack() { webView?.goBack() }
     func goForward() { webView?.goForward() }
@@ -80,11 +80,9 @@ final class WebViewNavigator {
 struct WebViewRepresentable: UIViewRepresentable {
     let url: URL?
     let navigator: WebViewNavigator
-    @Binding var canGoBack: Bool
-    @Binding var canGoForward: Bool
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(canGoBack: $canGoBack, canGoForward: $canGoForward)
+        Coordinator(navigator: navigator)
     }
 
     func makeUIView(context: Context) -> WKWebView {
@@ -108,26 +106,24 @@ struct WebViewRepresentable: UIViewRepresentable {
     }
 
     final class Coordinator {
-        @Binding private var canGoBack: Bool
-        @Binding private var canGoForward: Bool
+        private let navigator: WebViewNavigator
         private var backObservation: NSKeyValueObservation?
         private var forwardObservation: NSKeyValueObservation?
 
-        init(canGoBack: Binding<Bool>, canGoForward: Binding<Bool>) {
-            _canGoBack = canGoBack
-            _canGoForward = canGoForward
+        init(navigator: WebViewNavigator) {
+            self.navigator = navigator
         }
 
         func observe(_ webView: WKWebView) {
             // No `.initial`: it fires synchronously during makeUIView (inside the
-            // SwiftUI update phase) and writing the binding there triggers a
-            // "Modifying state during view update" warning. The @State defaults
+            // SwiftUI update phase) and mutating observable state there triggers a
+            // "Modifying state during view update" warning. The navigator defaults
             // to false, which already matches a fresh web view's history.
-            backObservation = webView.observe(\.canGoBack, options: [.new]) { [weak self] webView, _ in
-                self?.canGoBack = webView.canGoBack
+            backObservation = webView.observe(\.canGoBack, options: [.new]) { [navigator] webView, _ in
+                navigator.canGoBack = webView.canGoBack
             }
-            forwardObservation = webView.observe(\.canGoForward, options: [.new]) { [weak self] webView, _ in
-                self?.canGoForward = webView.canGoForward
+            forwardObservation = webView.observe(\.canGoForward, options: [.new]) { [navigator] webView, _ in
+                navigator.canGoForward = webView.canGoForward
             }
         }
 
