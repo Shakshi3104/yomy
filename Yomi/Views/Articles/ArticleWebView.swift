@@ -30,16 +30,9 @@ struct ArticleWebView: View {
                     Image(systemName: article.isSaved ? "bookmark.fill" : "bookmark")
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                // Share the page currently on screen, not always the original
-                // article — the user may have followed links inside the WebView.
-                if let url = navigator.currentURL ?? URL(string: article.url) {
-                    ShareLink(item: url) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                }
-            }
             ToolbarItemGroup(placement: .bottomBar) {
+                // Safari-style bottom bar: back / forward grouped on the leading
+                // side, share + reload on the trailing side.
                 Button {
                     navigator.goBack()
                 } label: {
@@ -47,14 +40,28 @@ struct ArticleWebView: View {
                 }
                 .disabled(!navigator.canGoBack)
 
-                Spacer()
-
                 Button {
                     navigator.goForward()
                 } label: {
                     Image(systemName: "chevron.forward")
                 }
                 .disabled(!navigator.canGoForward)
+
+                Spacer()
+
+                // Share the page currently on screen, not always the original
+                // article — the user may have followed links inside the WebView.
+                if let url = navigator.currentURL ?? URL(string: article.url) {
+                    ShareLink(item: url) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                }
+
+                Button {
+                    navigator.reload()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
             }
         }
         .onAppear {
@@ -79,6 +86,7 @@ final class WebViewNavigator {
 
     func goBack() { webView?.goBack() }
     func goForward() { webView?.goForward() }
+    func reload() { webView?.reload() }
 }
 
 struct WebViewRepresentable: UIViewRepresentable {
