@@ -53,14 +53,25 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
                 return
             }
             uiImage = nil
-            var request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
-            request.setValue("image/*", forHTTPHeaderField: "Accept")
-            guard let (data, response) = try? await URLSession.shared.data(for: request),
-                  let http = response as? HTTPURLResponse, http.statusCode < 400,
-                  let image = UIImage(data: data),
-                  !Task.isCancelled else { return }
-            ImageCache.shared.set(image, for: url)
-            uiImage = image
+            // ダウンロードとデコードはメインスレッド外で完了させる。
+            // UIImage(data:) はデコードを遅延し、初回描画時にメインスレッドで走るため、
+            // これをやらないとスクロールでセルが出るたびに固まる。
+            let loaded = await Self.loadImage(url: url)
+            guard !Task.isCancelled, let loaded else { return }
+            uiImage = loaded
         }
+    }
+
+    /// ネットワーク取得 → デコード確定(byPreparingForDisplay)まで main actor 外で行い、
+    /// 描画時にメインスレッドでデコードが発生しないようにする。結果はキャッシュへ格納する。
+    nonisolated private static func loadImage(url: URL) async -> UIImage? {
+        var request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
+        request.setValue("image/*", forHTTPHeaderField: "Accept")
+        guard let (data, response) = try? await URLSession.shared.data(for: request),
+              let http = response as? HTTPURLResponse, http.statusCode < 400,
+              let image = UIImage(data: data) else { return nil }
+        let decoded = await image.byPreparingForDisplay() ?? image
+        ImageCache.shared.set(decoded, for: url)
+        return decoded
     }
 }
