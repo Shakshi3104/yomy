@@ -5,9 +5,17 @@ struct ArticleFeedSections: View {
     var showsFeatured: Bool = true
     @Binding var selectedArticle: Article?
 
-    private var dedupedArticles: [Article] {
-        FeedService.dedupByURL(articles)
-    }
+    private static let shortFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MM/dd"
+        return f
+    }()
+
+    private static let fullFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy/MM/dd"
+        return f
+    }()
 
     private var siblingCountsByURL: [String: Int] {
         var counts: [String: Int] = [:]
@@ -17,25 +25,10 @@ struct ArticleFeedSections: View {
         return counts
     }
 
-    private func additionalFeedCount(for article: Article) -> Int {
-        guard !article.url.isEmpty else { return 0 }
-        return max(0, (siblingCountsByURL[article.url] ?? 1) - 1)
-    }
-
-    private var featuredArticle: Article? {
-        showsFeatured ? dedupedArticles.first : nil
-    }
-
-    private var groupedArticles: [(String, [Article])] {
-        let deduped = dedupedArticles
-        let rest = featuredArticle != nil ? Array(deduped.dropFirst()) : deduped
+    private static func group(_ articles: [Article]) -> [(String, [Article])] {
         let cal = Calendar.current
         let currentYear = cal.component(.year, from: Date())
-        let shortFormatter = DateFormatter()
-        shortFormatter.dateFormat = "MM/dd"
-        let fullFormatter = DateFormatter()
-        fullFormatter.dateFormat = "yyyy/MM/dd"
-        let groups = Dictionary(grouping: rest) { article -> String in
+        let groups = Dictionary(grouping: articles) { article -> String in
             if cal.isDateInToday(article.publishedAt) { return "Today" }
             if cal.isDateInYesterday(article.publishedAt) { return "Yesterday" }
             let year = cal.component(.year, from: article.publishedAt)
@@ -55,17 +48,26 @@ struct ArticleFeedSections: View {
     }
 
     var body: some View {
-        Group {
-            if let featured = featuredArticle {
+        // 派生データ(dedup・重複カウント・グルーピング)は body 評価ごとに 1 回だけ計算する。
+        // 各行から siblingCountsByURL を呼ぶ・dedup を複数回走らせると
+        // 行数×記事数の O(n²) となり、スクロール中の再評価で固まる原因になっていた。
+        let deduped = FeedService.dedupByURL(articles)
+        let counts = siblingCountsByURL
+        let featured = showsFeatured ? deduped.first : nil
+        let rest = featured != nil ? Array(deduped.dropFirst()) : deduped
+        let sections = Self.group(rest)
+
+        return Group {
+            if let featured {
                 Section {
-                    articleCardRow(article: featured, featured: true)
+                    articleCardRow(article: featured, featured: true, counts: counts)
                 }
             }
 
-            ForEach(groupedArticles, id: \.0) { section, sectionArticles in
+            ForEach(sections, id: \.0) { section, sectionArticles in
                 Section(section) {
                     ForEach(sectionArticles) { article in
-                        articleCardRow(article: article, featured: false)
+                        articleCardRow(article: article, featured: false, counts: counts)
                     }
                 }
             }
@@ -73,14 +75,15 @@ struct ArticleFeedSections: View {
     }
 
     @ViewBuilder
-    private func articleCardRow(article: Article, featured: Bool) -> some View {
+    private func articleCardRow(article: Article, featured: Bool, counts: [String: Int]) -> some View {
+        let extraFeedCount = article.url.isEmpty ? 0 : max(0, (counts[article.url] ?? 1) - 1)
         Button {
             selectedArticle = article
         } label: {
             ArticleRowView(
                 article: article,
                 featured: featured,
-                additionalFeedCount: additionalFeedCount(for: article)
+                additionalFeedCount: extraFeedCount
             )
         }
         .buttonStyle(.plain)
