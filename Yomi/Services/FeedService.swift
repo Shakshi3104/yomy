@@ -121,27 +121,27 @@ final class FeedService {
                 publishedAt: article.publishedAt
             )
         }
-        WidgetDataStore.save(widgetArticles)
 
-        let keepIDs = Set(widgetArticles.map(\.id))
-        WidgetDataStore.cleanUpImages(keeping: keepIDs)
+        // JSON 書き込み・画像キャッシュのクリーンアップ・画像ダウンロードは
+        // ディスク I/O とネットワークを含むためメインスレッドから切り離す。
+        // 起動直後の onAppear でここが同期実行されると初回描画がもたつく。
+        Task.detached(priority: .utility) {
+            WidgetDataStore.save(widgetArticles)
 
-        let reloaded = WidgetDataStore.load()
-        widgetLog.info("updateWidgetSnapshot: wrote=\(widgetArticles.count) reloaded=\(reloaded.count)")
+            let keepIDs = Set(widgetArticles.map(\.id))
+            WidgetDataStore.cleanUpImages(keeping: keepIDs)
 
-        WidgetCenter.shared.reloadTimelines(ofKind: "YomiWidget")
+            WidgetCenter.shared.reloadTimelines(ofKind: "YomiWidget")
 
-        let imageJobs: [(id: String, url: URL)] = top.compactMap { article in
-            let id = article.id.uuidString
-            guard let urlString = article.imageURL,
-                  let url = URL(string: urlString),
-                  WidgetDataStore.loadImage(for: id) == nil else { return nil }
-            return (id, url)
-        }
+            let imageJobs: [(id: String, url: URL)] = widgetArticles.compactMap { article in
+                guard let urlString = article.imageURL,
+                      let url = URL(string: urlString),
+                      WidgetDataStore.loadImage(for: article.id) == nil else { return nil }
+                return (article.id, url)
+            }
 
-        if imageJobs.isEmpty { return }
+            if imageJobs.isEmpty { return }
 
-        Task.detached {
             await withTaskGroup(of: Void.self) { group in
                 for job in imageJobs {
                     group.addTask {
