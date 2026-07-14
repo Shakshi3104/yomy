@@ -10,6 +10,7 @@ struct LatestView: View {
     @State private var isRefreshing = false
     @State private var selectedArticle: Article?
     @State private var showSettings = false
+    @State private var widgetUpdateTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -63,10 +64,10 @@ struct LatestView: View {
                 }
             }
             .onAppear {
-                updateWidgetData()
+                scheduleWidgetUpdate()
             }
             .onChange(of: articles) {
-                updateWidgetData()
+                scheduleWidgetUpdate()
             }
             .overlay {
                 if articles.isEmpty && !isRefreshing {
@@ -86,9 +87,16 @@ struct LatestView: View {
         isRefreshing = false
     }
 
-    private func updateWidgetData() {
+    /// 起動直後の初回描画をブロックしないよう Widget スナップショット更新を遅延させ、
+    /// リフレッシュ中に連続で発火する onChange を 1 回にデバウンスする。
+    private func scheduleWidgetUpdate() {
         guard !articles.isEmpty else { return }
-        FeedService.shared.updateWidgetSnapshot(context: context)
+        widgetUpdateTask?.cancel()
+        widgetUpdateTask = Task {
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled else { return }
+            FeedService.shared.updateWidgetSnapshot(context: context)
+        }
     }
 }
 
