@@ -11,12 +11,14 @@ struct SavedView: View {
     @Environment(\.modelContext) private var context
     @State private var selectedArticle: Article?
 
+    private static let monthFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy/MM"
+        return f
+    }()
+
     private func savedDate(for article: Article) -> Date {
         article.savedAt ?? article.createdAt
-    }
-
-    private var dedupedArticles: [Article] {
-        FeedService.dedupByURL(articles)
     }
 
     private var siblingCountsByURL: [String: Int] {
@@ -27,16 +29,9 @@ struct SavedView: View {
         return counts
     }
 
-    private func additionalFeedCount(for article: Article) -> Int {
-        guard !article.url.isEmpty else { return 0 }
-        return max(0, (siblingCountsByURL[article.url] ?? 1) - 1)
-    }
-
     private var grouped: [(String, [Article])] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM"
-        let groups = Dictionary(grouping: dedupedArticles) { article in
-            formatter.string(from: savedDate(for: article))
+        let groups = Dictionary(grouping: FeedService.dedupByURL(articles)) { article in
+            Self.monthFormatter.string(from: savedDate(for: article))
         }
         return groups
             .map { (key: $0.key, articles: $0.value) }
@@ -49,17 +44,23 @@ struct SavedView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        // 派生データは body 評価ごとに 1 回だけ計算する。
+        // 各行から siblingCountsByURL を呼ぶと行数×記事数の O(n²) となり、
+        // ブックマーク直後の再評価・スクロールが固まる原因になっていた。
+        let counts = siblingCountsByURL
+        let sections = grouped
+        return NavigationStack {
             List {
-                ForEach(grouped, id: \.0) { month, monthArticles in
+                ForEach(sections, id: \.0) { month, monthArticles in
                     Section(month) {
                         ForEach(monthArticles) { article in
+                            let extraFeedCount = article.url.isEmpty ? 0 : max(0, (counts[article.url] ?? 1) - 1)
                             Button {
                                 selectedArticle = article
                             } label: {
                                 ArticleRowView(
                                     article: article,
-                                    additionalFeedCount: additionalFeedCount(for: article)
+                                    additionalFeedCount: extraFeedCount
                                 )
                             }
                             .buttonStyle(.plain)
