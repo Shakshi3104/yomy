@@ -249,11 +249,21 @@ final class FeedService {
 
     func setSaved(article: Article, isSaved: Bool, context: ModelContext) {
         let now = Date()
-        applyToSiblings(of: article, context: context) {
-            $0.isSaved = isSaved
-            $0.savedAt = isSaved ? now : nil
+
+        // 1) タップされた記事だけを即時に反映し、bookmark.fill やメニュー閉じを即応させる。
+        article.isSaved = isSaved
+        article.savedAt = isSaved ? now : nil
+
+        // 2) 同一 URL の重複記事への波及と永続化(fetch + save)は次の main-actor ターンへ回す。
+        //    ここを同期実行するとディスクフラッシュ完了までタップ直後の再描画がブロックされ、
+        //    「保存/解除が若干重い」体感につながっていた。
+        Task {
+            applyToSiblings(of: article, context: context) {
+                $0.isSaved = isSaved
+                $0.savedAt = isSaved ? now : nil
+            }
+            try? context.save()
         }
-        try? context.save()
     }
 
     private func applyToSiblings(
